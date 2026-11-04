@@ -1,0 +1,1787 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "case": "cross-2pc",
+      "table": "lab_cross",
+      "requested_protocol": "2pc",
+      "payload_bytes_per_row": 32,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "2pc": 100
+      },
+      "commit_ms_p50": 0.941,
+      "commit_ms_p99": 1.824625,
+      "transaction_ms_p50": 1.518375,
+      "sample_loop_seconds_including_diagnostics": 0.1858233753591776,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 200.0,
+        "user_commit_rpc": 200.0,
+        "normal_raft_proposals_all_regions": 60.0,
+        "commit_txn_counter_ok_all_sessions": 100.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 2.0,
+        "user_commit_rpc": 2.0
+      },
+      "probe": {
+        "commit_ms": 1.244291,
+        "transaction_ms": 2.253916,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210795923046421,
+          "commit_ts": 470210795923046422,
+          "txn_commit_mode": "2pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 8192
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 271,
+          "START_KEY": "t_114_",
+          "END_KEY": "t_114_r_4",
+          "LEADER_ID": 273,
+          "LEADER_STORE_ID": 4,
+          "PEERS": "272, 273, 274",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 5,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        },
+        {
+          "REGION_ID": 18,
+          "START_KEY": "t_114_r_4",
+          "END_KEY": "t_281474976710648_",
+          "LEADER_ID": 19,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "19, 132, 200",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 356028,
+          "READ_BYTES": 437812,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 176,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 271,
+          "START_KEY": "t_114_",
+          "END_KEY": "t_114_r_4",
+          "LEADER_ID": 273,
+          "LEADER_STORE_ID": 4,
+          "PEERS": "272, 273, 274",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 5,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        },
+        {
+          "REGION_ID": 18,
+          "START_KEY": "t_114_r_4",
+          "END_KEY": "t_281474976710648_",
+          "LEADER_ID": 19,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "19, 132, 200",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 356028,
+          "READ_BYTES": 437812,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 176,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210796040749057,
+      "region_ids_stable": true,
+      "expected_protocol": "2pc",
+      "expected_commit_rpcs": 200,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "single-1pc",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 32,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.433167,
+      "commit_ms_p99": 3.65,
+      "transaction_ms_p50": 0.848875,
+      "sample_loop_seconds_including_diagnostics": 0.12973170820623636,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 1.036459,
+        "transaction_ms": 2.099459,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210796198035480,
+          "commit_ts": 470210796198035482,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 8192
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210796302893057,
+      "region_ids_stable": true,
+      "expected_protocol": "1pc",
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "cross-1pc",
+      "table": "lab_cross",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 32,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "2pc": 100
+      },
+      "commit_ms_p50": 1.077292,
+      "commit_ms_p99": 1.987667,
+      "transaction_ms_p50": 1.763209,
+      "sample_loop_seconds_including_diagnostics": 0.2181775001809001,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 200.0,
+        "user_commit_rpc": 200.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 100.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 2.0,
+        "user_commit_rpc": 2.0
+      },
+      "probe": {
+        "commit_ms": 1.404125,
+        "transaction_ms": 2.529583,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210796447334428,
+          "commit_ts": 470210796447334430,
+          "txn_commit_mode": "2pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": true,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 8192
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 271,
+          "START_KEY": "t_114_",
+          "END_KEY": "t_114_r_4",
+          "LEADER_ID": 273,
+          "LEADER_STORE_ID": 4,
+          "PEERS": "272, 273, 274",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 5,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        },
+        {
+          "REGION_ID": 18,
+          "START_KEY": "t_114_r_4",
+          "END_KEY": "t_281474976710648_",
+          "LEADER_ID": 19,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "19, 132, 200",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 356028,
+          "READ_BYTES": 437812,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 176,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 271,
+          "START_KEY": "t_114_",
+          "END_KEY": "t_114_r_4",
+          "LEADER_ID": 273,
+          "LEADER_STORE_ID": 4,
+          "PEERS": "272, 273, 274",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 5,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        },
+        {
+          "REGION_ID": 18,
+          "START_KEY": "t_114_r_4",
+          "END_KEY": "t_281474976710648_",
+          "LEADER_ID": 19,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "19, 132, 200",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 356028,
+          "READ_BYTES": 437812,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 176,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210796552192002,
+      "region_ids_stable": true,
+      "expected_protocol": "2pc",
+      "expected_commit_rpcs": 200,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "cross-async_commit",
+      "table": "lab_cross",
+      "requested_protocol": "async_commit",
+      "payload_bytes_per_row": 32,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "async_commit": 100
+      },
+      "commit_ms_p50": 0.64475,
+      "commit_ms_p99": 1.472334,
+      "transaction_ms_p50": 1.392042,
+      "sample_loop_seconds_including_diagnostics": 0.17231212556362152,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 200.0,
+        "user_commit_rpc": 200.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 100.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 2.0,
+        "user_commit_rpc": 2.0
+      },
+      "probe": {
+        "commit_ms": 0.809042,
+        "transaction_ms": 1.819458,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210796735692820,
+          "commit_ts": 470210796735692822,
+          "txn_commit_mode": "async_commit",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 8192
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 271,
+          "START_KEY": "t_114_",
+          "END_KEY": "t_114_r_4",
+          "LEADER_ID": 273,
+          "LEADER_STORE_ID": 4,
+          "PEERS": "272, 273, 274",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 5,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        },
+        {
+          "REGION_ID": 18,
+          "START_KEY": "t_114_r_4",
+          "END_KEY": "t_281474976710648_",
+          "LEADER_ID": 19,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "19, 132, 200",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 356028,
+          "READ_BYTES": 437812,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 176,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 271,
+          "START_KEY": "t_114_",
+          "END_KEY": "t_114_r_4",
+          "LEADER_ID": 273,
+          "LEADER_STORE_ID": 4,
+          "PEERS": "272, 273, 274",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 5,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        },
+        {
+          "REGION_ID": 18,
+          "START_KEY": "t_114_r_4",
+          "END_KEY": "t_281474976710648_",
+          "LEADER_ID": 19,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "19, 132, 200",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 356028,
+          "READ_BYTES": 437812,
+          "APPROXIMATE_SIZE(MB)": 1,
+          "APPROXIMATE_KEYS": 176,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210796840550401,
+      "region_ids_stable": true,
+      "expected_protocol": "async_commit",
+      "expected_commit_rpcs": 200,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "single-async_commit",
+      "table": "lab_single",
+      "requested_protocol": "async_commit",
+      "payload_bytes_per_row": 32,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "async_commit": 100
+      },
+      "commit_ms_p50": 0.38175,
+      "commit_ms_p99": 0.825125,
+      "transaction_ms_p50": 0.907167,
+      "sample_loop_seconds_including_diagnostics": 0.10970816668123007,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 100.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 100.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 1.0
+      },
+      "probe": {
+        "commit_ms": 0.751667,
+        "transaction_ms": 1.939709,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210797010681869,
+          "commit_ts": 470210797010681871,
+          "txn_commit_mode": "async_commit",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 8192
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210797115801601,
+      "region_ids_stable": true,
+      "expected_protocol": "async_commit",
+      "expected_commit_rpcs": 100,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "single-2pc",
+      "table": "lab_single",
+      "requested_protocol": "2pc",
+      "payload_bytes_per_row": 32,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "2pc": 100
+      },
+      "commit_ms_p50": 0.67,
+      "commit_ms_p99": 2.165625,
+      "transaction_ms_p50": 1.051333,
+      "sample_loop_seconds_including_diagnostics": 0.1450430415570736,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 100.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 100.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 1.0
+      },
+      "probe": {
+        "commit_ms": 1.037916,
+        "transaction_ms": 2.07225,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210797259718669,
+          "commit_ts": 470210797259718670,
+          "txn_commit_mode": "2pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 8192
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210797364576257,
+      "region_ids_stable": true,
+      "expected_protocol": "2pc",
+      "expected_commit_rpcs": 100,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-512",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 512,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.482792,
+      "commit_ms_p99": 1.067292,
+      "transaction_ms_p50": 0.961708,
+      "sample_loop_seconds_including_diagnostics": 0.1163392923772335,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 2.374708,
+        "transaction_ms": 7.938166,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210797509017623,
+          "commit_ts": 470210797509017625,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 16384
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210797626720257,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-1024",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 1024,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.541209,
+      "commit_ms_p99": 2.510083,
+      "transaction_ms_p50": 1.057792,
+      "sample_loop_seconds_including_diagnostics": 0.14408879168331623,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.900375,
+        "transaction_ms": 2.309417,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210797758054423,
+          "commit_ts": 470210797770899458,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 16384
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210797875757057,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-1800",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 1800,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.481875,
+      "commit_ms_p99": 1.055416,
+      "transaction_ms_p50": 1.004916,
+      "sample_loop_seconds_including_diagnostics": 0.11686841677874327,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 769.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.774208,
+        "transaction_ms": 1.745167,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210798020198423,
+          "commit_ts": 470210798020198425,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 32768
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210798125056002,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-2000",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 2000,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.540542,
+      "commit_ms_p99": 1.277459,
+      "transaction_ms_p50": 1.116375,
+      "sample_loop_seconds_including_diagnostics": 0.13888875022530556,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.822583,
+        "transaction_ms": 2.0055,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210798268973079,
+          "commit_ts": 470210798268973081,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 32768
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210798387200001,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-2048",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 2048,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.579167,
+      "commit_ms_p99": 2.016792,
+      "transaction_ms_p50": 1.166417,
+      "sample_loop_seconds_including_diagnostics": 0.16846445854753256,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 262.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.694625,
+        "transaction_ms": 1.673083,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210798531379223,
+          "commit_ts": 470210798531379225,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 32768
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210798635974657,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-2304",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 2304,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.477666,
+      "commit_ms_p99": 1.451625,
+      "transaction_ms_p50": 0.990417,
+      "sample_loop_seconds_including_diagnostics": 0.13373383320868015,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.666916,
+        "transaction_ms": 1.548,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210798793523223,
+          "commit_ts": 470210798793523225,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 32768
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210798898118657,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-2336",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 2336,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "2pc": 100
+      },
+      "commit_ms_p50": 0.869041,
+      "commit_ms_p99": 1.604459,
+      "transaction_ms_p50": 1.363542,
+      "sample_loop_seconds_including_diagnostics": 0.17348700016736984,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 200.0,
+        "user_commit_rpc": 100.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 100.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 2.0,
+        "user_commit_rpc": 1.0
+      },
+      "probe": {
+        "commit_ms": 1.2185,
+        "transaction_ms": 2.182166,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210799055405070,
+          "commit_ts": 470210799055405072,
+          "txn_commit_mode": "2pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": true,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 32768
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210799160524801,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 100,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-4096",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 4096,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "2pc": 100
+      },
+      "commit_ms_p50": 0.963042,
+      "commit_ms_p99": 2.89775,
+      "transaction_ms_p50": 1.552417,
+      "sample_loop_seconds_including_diagnostics": 0.1892329165711999,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 200.0,
+        "user_commit_rpc": 100.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 100.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 2.0,
+        "user_commit_rpc": 1.0
+      },
+      "probe": {
+        "commit_ms": 1.082834,
+        "transaction_ms": 2.051417,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210799317549070,
+          "commit_ts": 470210799317549072,
+          "txn_commit_mode": "2pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": true,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 61440
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210799423193089,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 100,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "size-8192",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 8192,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "2pc": 100
+      },
+      "commit_ms_p50": 1.20925,
+      "commit_ms_p99": 2.086958,
+      "transaction_ms_p50": 2.029334,
+      "sample_loop_seconds_including_diagnostics": 0.23294712509959936,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 400.0,
+        "user_commit_rpc": 100.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 100.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 4.0,
+        "user_commit_rpc": 1.0
+      },
+      "probe": {
+        "commit_ms": 1.238917,
+        "transaction_ms": 2.284792,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210799579955228,
+          "commit_ts": 470210799579955230,
+          "txn_commit_mode": "2pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": true,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 118784
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210799697657857,
+      "region_ids_stable": true,
+      "expected_protocol": null,
+      "expected_commit_rpcs": 100,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "single-large-mutation",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 32768,
+      "rows_per_transaction": 1,
+      "txn_commit_batch_size": 16384,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.482334,
+      "commit_ms_p99": 1.341917,
+      "transaction_ms_p50": 1.442459,
+      "sample_loop_seconds_including_diagnostics": 0.18079704232513905,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.547166,
+        "transaction_ms": 1.800833,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210799868051470,
+          "commit_ts": 470210799868051472,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 1,
+            "MEM_BUFFER_BYTES": 69632
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210799973171201,
+      "region_ids_stable": true,
+      "expected_protocol": "1pc",
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "batch-wide",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 1024,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 65536,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.395833,
+      "commit_ms_p99": 0.758333,
+      "transaction_ms_p50": 0.783334,
+      "sample_loop_seconds_including_diagnostics": 0.09687612485140562,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.559042,
+        "transaction_ms": 1.38675,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210800130195480,
+          "commit_ts": 470210800130195482,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 16384
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210800235315201,
+      "region_ids_stable": true,
+      "expected_protocol": "1pc",
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "batch-narrow",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 1024,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 4096,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "2pc": 100
+      },
+      "commit_ms_p50": 0.850042,
+      "commit_ms_p99": 1.708958,
+      "transaction_ms_p50": 1.277375,
+      "sample_loop_seconds_including_diagnostics": 0.1570097915828228,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 200.0,
+        "user_commit_rpc": 100.0,
+        "normal_raft_proposals_all_regions": 0.0,
+        "commit_txn_counter_ok_all_sessions": 100.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 0.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 2.0,
+        "user_commit_rpc": 1.0
+      },
+      "probe": {
+        "commit_ms": 1.231917,
+        "transaction_ms": 2.006625,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210800379232286,
+          "commit_ts": 470210800379232288,
+          "txn_commit_mode": "2pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": true,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 16384
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210800484352001,
+      "region_ids_stable": true,
+      "expected_protocol": "2pc",
+      "expected_commit_rpcs": 100,
+      "rpc_signature_valid": true,
+      "passed": true
+    },
+    {
+      "case": "batch-wide-again",
+      "table": "lab_single",
+      "requested_protocol": "1pc",
+      "payload_bytes_per_row": 1024,
+      "rows_per_transaction": 8,
+      "txn_commit_batch_size": 65536,
+      "samples": 100,
+      "warmup": 5,
+      "actual_protocols": {
+        "1pc": 100
+      },
+      "commit_ms_p50": 0.564084,
+      "commit_ms_p99": 0.960167,
+      "transaction_ms_p50": 1.134959,
+      "sample_loop_seconds_including_diagnostics": 0.12996499985456467,
+      "rpc_and_cluster_counter_delta": {
+        "user_prewrite_rpc": 100.0,
+        "user_commit_rpc": 0.0,
+        "normal_raft_proposals_all_regions": 962.0,
+        "commit_txn_counter_ok_all_sessions": 0.0,
+        "async_commit_txn_counter_ok_all_sessions": 0.0,
+        "one_pc_txn_counter_ok_all_sessions": 100.0
+      },
+      "rpc_per_transaction": {
+        "user_prewrite_rpc": 1.0,
+        "user_commit_rpc": 0.0
+      },
+      "probe": {
+        "commit_ms": 0.612083,
+        "transaction_ms": 1.442416,
+        "info": {
+          "txn_scope": "global",
+          "start_ts": 470210800641376277,
+          "commit_ts": 470210800641376279,
+          "txn_commit_mode": "1pc",
+          "async_commit_fallback": false,
+          "one_pc_fallback": false,
+          "pipelined": false,
+          "flush_wait_ms": 0
+        },
+        "buffer_info": [
+          {
+            "MEM_BUFFER_KEYS": 8,
+            "MEM_BUFFER_BYTES": 16384
+          }
+        ]
+      },
+      "regions_before": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "regions_after": [
+        {
+          "REGION_ID": 267,
+          "START_KEY": "t_112_",
+          "END_KEY": "t_114_",
+          "LEADER_ID": 268,
+          "LEADER_STORE_ID": 1,
+          "PEERS": "268, 269, 270",
+          "SCATTERING": 0,
+          "WRITTEN_BYTES": 0,
+          "READ_BYTES": 0,
+          "APPROXIMATE_SIZE(MB)": 26,
+          "APPROXIMATE_KEYS": 15872,
+          "SCHEDULING_CONSTRAINTS": "",
+          "SCHEDULING_STATE": ""
+        }
+      ],
+      "first_sample_start_ts": 470210800746496001,
+      "region_ids_stable": true,
+      "expected_protocol": "1pc",
+      "expected_commit_rpcs": 0,
+      "rpc_signature_valid": true,
+      "passed": true
+    }
+  ],
+  "restored_batch_size": 16384
+}

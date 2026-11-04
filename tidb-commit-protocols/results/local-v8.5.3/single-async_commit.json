@@ -1,0 +1,89 @@
+{
+  "case": "single-async_commit",
+  "table": "lab_single",
+  "requested_protocol": "async_commit",
+  "payload_bytes_per_row": 32,
+  "rows_per_transaction": 8,
+  "txn_commit_batch_size": 16384,
+  "samples": 100,
+  "warmup": 5,
+  "actual_protocols": {
+    "async_commit": 100
+  },
+  "commit_ms_p50": 0.38175,
+  "commit_ms_p99": 0.825125,
+  "transaction_ms_p50": 0.907167,
+  "sample_loop_seconds_including_diagnostics": 0.10970816668123007,
+  "rpc_and_cluster_counter_delta": {
+    "user_prewrite_rpc": 100.0,
+    "user_commit_rpc": 100.0,
+    "normal_raft_proposals_all_regions": 0.0,
+    "commit_txn_counter_ok_all_sessions": 0.0,
+    "async_commit_txn_counter_ok_all_sessions": 100.0,
+    "one_pc_txn_counter_ok_all_sessions": 0.0
+  },
+  "rpc_per_transaction": {
+    "user_prewrite_rpc": 1.0,
+    "user_commit_rpc": 1.0
+  },
+  "probe": {
+    "commit_ms": 0.751667,
+    "transaction_ms": 1.939709,
+    "info": {
+      "txn_scope": "global",
+      "start_ts": 470210797010681869,
+      "commit_ts": 470210797010681871,
+      "txn_commit_mode": "async_commit",
+      "async_commit_fallback": false,
+      "one_pc_fallback": false,
+      "pipelined": false,
+      "flush_wait_ms": 0
+    },
+    "buffer_info": [
+      {
+        "MEM_BUFFER_KEYS": 8,
+        "MEM_BUFFER_BYTES": 8192
+      }
+    ]
+  },
+  "regions_before": [
+    {
+      "REGION_ID": 267,
+      "START_KEY": "t_112_",
+      "END_KEY": "t_114_",
+      "LEADER_ID": 268,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "268, 269, 270",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 26,
+      "APPROXIMATE_KEYS": 15872,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "regions_after": [
+    {
+      "REGION_ID": 267,
+      "START_KEY": "t_112_",
+      "END_KEY": "t_114_",
+      "LEADER_ID": 268,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "268, 269, 270",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 26,
+      "APPROXIMATE_KEYS": 15872,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "first_sample_start_ts": 470210797115801601,
+  "region_ids_stable": true,
+  "expected_protocol": "async_commit",
+  "expected_commit_rpcs": 100,
+  "rpc_signature_valid": true,
+  "passed": true
+}

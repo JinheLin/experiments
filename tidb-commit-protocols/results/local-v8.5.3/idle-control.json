@@ -1,0 +1,8 @@
+{
+  "user_prewrite_rpc": 0.0,
+  "user_commit_rpc": 0.0,
+  "normal_raft_proposals_all_regions": 0.0,
+  "commit_txn_counter_ok_all_sessions": 0.0,
+  "async_commit_txn_counter_ok_all_sessions": 0.0,
+  "one_pc_txn_counter_ok_all_sessions": 0.0
+}

@@ -1,0 +1,89 @@
+{
+  "case": "size-8192",
+  "table": "lab_single",
+  "requested_protocol": "1pc",
+  "payload_bytes_per_row": 8192,
+  "rows_per_transaction": 8,
+  "txn_commit_batch_size": 16384,
+  "samples": 100,
+  "warmup": 5,
+  "actual_protocols": {
+    "2pc": 100
+  },
+  "commit_ms_p50": 1.20925,
+  "commit_ms_p99": 2.086958,
+  "transaction_ms_p50": 2.029334,
+  "sample_loop_seconds_including_diagnostics": 0.23294712509959936,
+  "rpc_and_cluster_counter_delta": {
+    "user_prewrite_rpc": 400.0,
+    "user_commit_rpc": 100.0,
+    "normal_raft_proposals_all_regions": 0.0,
+    "commit_txn_counter_ok_all_sessions": 100.0,
+    "async_commit_txn_counter_ok_all_sessions": 0.0,
+    "one_pc_txn_counter_ok_all_sessions": 0.0
+  },
+  "rpc_per_transaction": {
+    "user_prewrite_rpc": 4.0,
+    "user_commit_rpc": 1.0
+  },
+  "probe": {
+    "commit_ms": 1.238917,
+    "transaction_ms": 2.284792,
+    "info": {
+      "txn_scope": "global",
+      "start_ts": 470210799579955228,
+      "commit_ts": 470210799579955230,
+      "txn_commit_mode": "2pc",
+      "async_commit_fallback": false,
+      "one_pc_fallback": true,
+      "pipelined": false,
+      "flush_wait_ms": 0
+    },
+    "buffer_info": [
+      {
+        "MEM_BUFFER_KEYS": 8,
+        "MEM_BUFFER_BYTES": 118784
+      }
+    ]
+  },
+  "regions_before": [
+    {
+      "REGION_ID": 267,
+      "START_KEY": "t_112_",
+      "END_KEY": "t_114_",
+      "LEADER_ID": 268,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "268, 269, 270",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 26,
+      "APPROXIMATE_KEYS": 15872,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "regions_after": [
+    {
+      "REGION_ID": 267,
+      "START_KEY": "t_112_",
+      "END_KEY": "t_114_",
+      "LEADER_ID": 268,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "268, 269, 270",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 26,
+      "APPROXIMATE_KEYS": 15872,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "first_sample_start_ts": 470210799697657857,
+  "region_ids_stable": true,
+  "expected_protocol": null,
+  "expected_commit_rpcs": 100,
+  "rpc_signature_valid": true,
+  "passed": true
+}

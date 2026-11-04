@@ -1,0 +1,9 @@
+[storage.block-cache]
+capacity = "128MB"
+
+[raftstore]
+store-pool-size = 2
+apply-pool-size = 2
+
+[server]
+grpc-concurrency = 2

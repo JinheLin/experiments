@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-04",
+  "database_release": "v8.5.3",
+  "platform": "macOS arm64",
+  "client": "/opt/homebrew/opt/mysql-client@8.0/bin/mysql  Ver 8.0.46 for macos15.7 on arm64 (Homebrew)",
+  "expected_protocols": [
+    "2pc",
+    "async_commit",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "1pc"
+  ],
+  "actual_protocols": [
+    "2pc",
+    "async_commit",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "1pc"
+  ],
+  "region_counts": [
+    1,
+    2,
+    1
+  ],
+  "single_region_id_unchanged": true,
+  "restored_batch_size": 16384,
+  "passed": true
+}

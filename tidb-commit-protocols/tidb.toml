@@ -1,0 +1,4 @@
+[log]
+level = "info"
+slow-threshold = 0
+enable-slow-log = true

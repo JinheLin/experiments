@@ -1,0 +1,33 @@
+@@GLOBAL.tidb_txn_commit_batch_size
+16384
+TOTAL_SPLIT_REGION	SCATTER_FINISH_RATIO
+1	1
+REGION_ID	START_KEY	END_KEY	LEADER_ID	LEADER_STORE_ID	PEERS	SCATTERING	WRITTEN_BYTES	READ_BYTES	APPROXIMATE_SIZE(MB)	APPROXIMATE_KEYS	SCHEDULING_CONSTRAINTS	SCHEDULING_STATE
+279	t_112_	t_114_	280	1	280, 281, 282	0	0	0	1	0		
+REGION_ID	START_KEY	END_KEY	LEADER_ID	LEADER_STORE_ID	PEERS	SCATTERING	WRITTEN_BYTES	READ_BYTES	APPROXIMATE_SIZE(MB)	APPROXIMATE_KEYS	SCHEDULING_CONSTRAINTS	SCHEDULING_STATE
+283	t_114_	t_114_r_4	285	2	284, 285, 286	0	0	0	1	0		
+22	t_114_r_4	t_281474976710648_	23	1	23, 145, 211	0	825	0	1	0		
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023342616582,"commit_ts":470223023342616583,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023342616587,"commit_ts":470223023342616589,"txn_commit_mode":"async_commit","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023342616592,"commit_ts":470223023342616594,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023342616595,"commit_ts":470223023342616597,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":true,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023355461635,"commit_ts":470223023355461637,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023355461638,"commit_ts":470223023355461640,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":true,"pipelined":false,"flush_wait_ms":0}
+REGION_ID	START_KEY	END_KEY	LEADER_ID	LEADER_STORE_ID	PEERS	SCATTERING	WRITTEN_BYTES	READ_BYTES	APPROXIMATE_SIZE(MB)	APPROXIMATE_KEYS	SCHEDULING_CONSTRAINTS	SCHEDULING_STATE
+279	t_112_	t_114_	280	1	280, 281, 282	0	0	0	1	0		
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023355461651,"commit_ts":470223023355461653,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023355461659,"commit_ts":470223023355461661,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":true,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023355461668,"commit_ts":470223023355461670,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470223023355461676,"commit_ts":470223023355461678,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@GLOBAL.tidb_txn_commit_batch_size
+16384

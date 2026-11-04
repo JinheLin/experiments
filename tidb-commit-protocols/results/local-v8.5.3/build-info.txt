@@ -1,0 +1,3 @@
+	dep	github.com/tikv/client-go/v2	v2.0.8-0.20250711063936-827bf098b155	h1:PyVmX5Byyo6Tq3TNnUdyiFP/DAlX/QyfIbNp1mCmjWQ=
+	build	vcs.revision=dc2548aac79a712265e831cff2a3a896bc0a5a38
+	build	vcs.modified=false

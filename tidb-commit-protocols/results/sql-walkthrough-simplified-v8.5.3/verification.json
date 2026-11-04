@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-04",
+  "database_release": "v8.5.3",
+  "platform": "macOS arm64",
+  "client": "/opt/homebrew/opt/mysql-client@8.0/bin/mysql  Ver 8.0.46 for macos15.7 on arm64 (Homebrew)",
+  "input_sha256": "86f6b344449582c5470c4a9222e1aa7f0d82fca900f18d9c62a90a02342af53d",
+  "sql_statements": 58,
+  "expected_protocols": [
+    "2pc",
+    "async_commit",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "1pc"
+  ],
+  "actual_protocols": [
+    "2pc",
+    "async_commit",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "2pc",
+    "1pc",
+    "1pc"
+  ],
+  "region_counts": [
+    1,
+    2,
+    1
+  ],
+  "single_region_id_unchanged": true,
+  "single_region_id": 275,
+  "final_batch_size": 16384,
+  "final_v_sums": {
+    "lab_single": 65,
+    "lab_cross": 8
+  },
+  "cluster": [
+    {
+      "type": "pd",
+      "version": "8.5.3",
+      "git_hash": "65e429d26e81db93c590890ddacf18c4b970f299"
+    },
+    {
+      "type": "tidb",
+      "version": "8.5.3",
+      "git_hash": "dc2548aac79a712265e831cff2a3a896bc0a5a38"
+    },
+    {
+      "type": "tikv",
+      "version": "8.5.3",
+      "git_hash": "13b9af5c34ad0dd62b5ae5ee02e05806e6d31e0b"
+    },
+    {
+      "type": "tikv",
+      "version": "8.5.3",
+      "git_hash": "13b9af5c34ad0dd62b5ae5ee02e05806e6d31e0b"
+    },
+    {
+      "type": "tikv",
+      "version": "8.5.3",
+      "git_hash": "13b9af5c34ad0dd62b5ae5ee02e05806e6d31e0b"
+    }
+  ],
+  "passed": true
+}

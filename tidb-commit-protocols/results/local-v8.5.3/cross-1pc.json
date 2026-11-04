@@ -1,0 +1,119 @@
+{
+  "case": "cross-1pc",
+  "table": "lab_cross",
+  "requested_protocol": "1pc",
+  "payload_bytes_per_row": 32,
+  "rows_per_transaction": 8,
+  "txn_commit_batch_size": 16384,
+  "samples": 100,
+  "warmup": 5,
+  "actual_protocols": {
+    "2pc": 100
+  },
+  "commit_ms_p50": 1.077292,
+  "commit_ms_p99": 1.987667,
+  "transaction_ms_p50": 1.763209,
+  "sample_loop_seconds_including_diagnostics": 0.2181775001809001,
+  "rpc_and_cluster_counter_delta": {
+    "user_prewrite_rpc": 200.0,
+    "user_commit_rpc": 200.0,
+    "normal_raft_proposals_all_regions": 0.0,
+    "commit_txn_counter_ok_all_sessions": 100.0,
+    "async_commit_txn_counter_ok_all_sessions": 0.0,
+    "one_pc_txn_counter_ok_all_sessions": 0.0
+  },
+  "rpc_per_transaction": {
+    "user_prewrite_rpc": 2.0,
+    "user_commit_rpc": 2.0
+  },
+  "probe": {
+    "commit_ms": 1.404125,
+    "transaction_ms": 2.529583,
+    "info": {
+      "txn_scope": "global",
+      "start_ts": 470210796447334428,
+      "commit_ts": 470210796447334430,
+      "txn_commit_mode": "2pc",
+      "async_commit_fallback": false,
+      "one_pc_fallback": true,
+      "pipelined": false,
+      "flush_wait_ms": 0
+    },
+    "buffer_info": [
+      {
+        "MEM_BUFFER_KEYS": 8,
+        "MEM_BUFFER_BYTES": 8192
+      }
+    ]
+  },
+  "regions_before": [
+    {
+      "REGION_ID": 271,
+      "START_KEY": "t_114_",
+      "END_KEY": "t_114_r_4",
+      "LEADER_ID": 273,
+      "LEADER_STORE_ID": 4,
+      "PEERS": "272, 273, 274",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 1,
+      "APPROXIMATE_KEYS": 5,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    },
+    {
+      "REGION_ID": 18,
+      "START_KEY": "t_114_r_4",
+      "END_KEY": "t_281474976710648_",
+      "LEADER_ID": 19,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "19, 132, 200",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 356028,
+      "READ_BYTES": 437812,
+      "APPROXIMATE_SIZE(MB)": 1,
+      "APPROXIMATE_KEYS": 176,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "regions_after": [
+    {
+      "REGION_ID": 271,
+      "START_KEY": "t_114_",
+      "END_KEY": "t_114_r_4",
+      "LEADER_ID": 273,
+      "LEADER_STORE_ID": 4,
+      "PEERS": "272, 273, 274",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 1,
+      "APPROXIMATE_KEYS": 5,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    },
+    {
+      "REGION_ID": 18,
+      "START_KEY": "t_114_r_4",
+      "END_KEY": "t_281474976710648_",
+      "LEADER_ID": 19,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "19, 132, 200",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 356028,
+      "READ_BYTES": 437812,
+      "APPROXIMATE_SIZE(MB)": 1,
+      "APPROXIMATE_KEYS": 176,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "first_sample_start_ts": 470210796552192002,
+  "region_ids_stable": true,
+  "expected_protocol": "2pc",
+  "expected_commit_rpcs": 200,
+  "rpc_signature_valid": true,
+  "passed": true
+}

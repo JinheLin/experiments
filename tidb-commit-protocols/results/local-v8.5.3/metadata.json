@@ -1,0 +1,247 @@
+{
+  "started_at_utc": "2026-11-03T13:17:15.968473+00:00",
+  "platform": "macOS-15.1.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.3 (main, Feb  3 2026, 15:32:20) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "runner_sha256": "c0d5c62184461b55159315a7ce720640ede86148f0ff01f2c4ec366d062d2de0",
+  "argv": [
+    "experiments/tidb-commit-protocols/run.py",
+    "--repeats",
+    "100",
+    "--warmup",
+    "5",
+    "--output",
+    "experiments/tidb-commit-protocols/results/local-v8.5.3"
+  ],
+  "cluster": [
+    {
+      "TYPE": "tidb",
+      "INSTANCE": "127.0.0.1:34000",
+      "STATUS_ADDRESS": "127.0.0.1:40080",
+      "VERSION": "8.5.3",
+      "GIT_HASH": "dc2548aac79a712265e831cff2a3a896bc0a5a38"
+    },
+    {
+      "TYPE": "pd",
+      "INSTANCE": "127.0.0.1:32379",
+      "STATUS_ADDRESS": "127.0.0.1:32379",
+      "VERSION": "8.5.3",
+      "GIT_HASH": "65e429d26e81db93c590890ddacf18c4b970f299"
+    },
+    {
+      "TYPE": "tikv",
+      "INSTANCE": "127.0.0.1:50161",
+      "STATUS_ADDRESS": "127.0.0.1:50181",
+      "VERSION": "8.5.3",
+      "GIT_HASH": "13b9af5c34ad0dd62b5ae5ee02e05806e6d31e0b"
+    },
+    {
+      "TYPE": "tikv",
+      "INSTANCE": "127.0.0.1:50162",
+      "STATUS_ADDRESS": "127.0.0.1:50182",
+      "VERSION": "8.5.3",
+      "GIT_HASH": "13b9af5c34ad0dd62b5ae5ee02e05806e6d31e0b"
+    },
+    {
+      "TYPE": "tikv",
+      "INSTANCE": "127.0.0.1:50160",
+      "STATUS_ADDRESS": "127.0.0.1:50180",
+      "VERSION": "8.5.3",
+      "GIT_HASH": "13b9af5c34ad0dd62b5ae5ee02e05806e6d31e0b"
+    }
+  ],
+  "tidb_version": "Release Version: v8.5.3\nEdition: Community\nGit Commit Hash: dc2548aac79a712265e831cff2a3a896bc0a5a38\nGit Branch: HEAD\nUTC Build Time: 2025-07-31 13:54:59\nGoVersion: go1.23.6\nRace Enabled: false\nCheck Table Before Drop: false\nStore: tikv",
+  "original_batch_size": 16384,
+  "single_regions": [
+    {
+      "REGION_ID": 267,
+      "START_KEY": "t_112_",
+      "END_KEY": "t_114_",
+      "LEADER_ID": 268,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "268, 269, 270",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 26,
+      "APPROXIMATE_KEYS": 15872,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "cross_regions": [
+    {
+      "REGION_ID": 271,
+      "START_KEY": "t_114_",
+      "END_KEY": "t_114_r_4",
+      "LEADER_ID": 273,
+      "LEADER_STORE_ID": 4,
+      "PEERS": "272, 273, 274",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 0,
+      "READ_BYTES": 0,
+      "APPROXIMATE_SIZE(MB)": 1,
+      "APPROXIMATE_KEYS": 5,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    },
+    {
+      "REGION_ID": 18,
+      "START_KEY": "t_114_r_4",
+      "END_KEY": "t_281474976710648_",
+      "LEADER_ID": 19,
+      "LEADER_STORE_ID": 1,
+      "PEERS": "19, 132, 200",
+      "SCATTERING": 0,
+      "WRITTEN_BYTES": 356028,
+      "READ_BYTES": 437812,
+      "APPROXIMATE_SIZE(MB)": 1,
+      "APPROXIMATE_KEYS": 176,
+      "SCHEDULING_CONSTRAINTS": "",
+      "SCHEDULING_STATE": ""
+    }
+  ],
+  "replicas": [
+    {
+      "id": 18,
+      "start_key": "7480000000000000FF725F728000000000FF0000040000000000FA",
+      "end_key": "748000FFFFFFFFFFFFF800000000000000F8",
+      "epoch": {
+        "conf_ver": 5,
+        "version": 63
+      },
+      "peers": [
+        {
+          "role_name": "Voter",
+          "id": 19,
+          "store_id": 1
+        },
+        {
+          "role_name": "Voter",
+          "id": 132,
+          "store_id": 4
+        },
+        {
+          "role_name": "Voter",
+          "id": 200,
+          "store_id": 5
+        }
+      ],
+      "leader": {
+        "role_name": "Voter",
+        "id": 19,
+        "store_id": 1
+      },
+      "cpu_usage": 0,
+      "written_bytes": 356028,
+      "read_bytes": 437812,
+      "written_keys": 4454,
+      "read_keys": 10368,
+      "approximate_size": 1,
+      "approximate_keys": 176
+    },
+    {
+      "id": 267,
+      "start_key": "7480000000000000FF7000000000000000F8",
+      "end_key": "7480000000000000FF7200000000000000F8",
+      "epoch": {
+        "conf_ver": 5,
+        "version": 62
+      },
+      "peers": [
+        {
+          "role_name": "Voter",
+          "id": 268,
+          "store_id": 1
+        },
+        {
+          "role_name": "Voter",
+          "id": 269,
+          "store_id": 4
+        },
+        {
+          "role_name": "Voter",
+          "id": 270,
+          "store_id": 5
+        }
+      ],
+      "leader": {
+        "role_name": "Voter",
+        "id": 268,
+        "store_id": 1
+      },
+      "cpu_usage": 0,
+      "written_bytes": 0,
+      "read_bytes": 0,
+      "written_keys": 0,
+      "read_keys": 0,
+      "approximate_size": 26,
+      "approximate_keys": 15872
+    },
+    {
+      "id": 271,
+      "start_key": "7480000000000000FF7200000000000000F8",
+      "end_key": "7480000000000000FF725F728000000000FF0000040000000000FA",
+      "epoch": {
+        "conf_ver": 5,
+        "version": 63
+      },
+      "peers": [
+        {
+          "role_name": "Voter",
+          "id": 272,
+          "store_id": 1
+        },
+        {
+          "role_name": "Voter",
+          "id": 273,
+          "store_id": 4
+        },
+        {
+          "role_name": "Voter",
+          "id": 274,
+          "store_id": 5
+        }
+      ],
+      "leader": {
+        "role_name": "Voter",
+        "id": 273,
+        "store_id": 4
+      },
+      "cpu_usage": 0,
+      "written_bytes": 0,
+      "read_bytes": 0,
+      "written_keys": 0,
+      "read_keys": 0,
+      "approximate_size": 1,
+      "approximate_keys": 5
+    }
+  ],
+  "client_go_revision": "827bf098b155",
+  "random_seed": 20261103,
+  "tidb_session_settings": [
+    {
+      "Variable_name": "tidb_dml_type",
+      "Value": "STANDARD"
+    },
+    {
+      "Variable_name": "tidb_enable_1pc",
+      "Value": "ON"
+    },
+    {
+      "Variable_name": "tidb_enable_async_commit",
+      "Value": "ON"
+    },
+    {
+      "Variable_name": "tidb_guarantee_linearizability",
+      "Value": "ON"
+    },
+    {
+      "Variable_name": "tidb_txn_mode",
+      "Value": "pessimistic"
+    },
+    {
+      "Variable_name": "transaction_isolation",
+      "Value": "REPEATABLE-READ"
+    }
+  ]
+}

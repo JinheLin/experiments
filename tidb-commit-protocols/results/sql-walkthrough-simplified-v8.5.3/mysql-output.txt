@@ -1,0 +1,29 @@
+TOTAL_SPLIT_REGION	SCATTER_FINISH_RATIO
+1	1
+REGION_ID	START_KEY	END_KEY	LEADER_ID	LEADER_STORE_ID	PEERS	SCATTERING	WRITTEN_BYTES	READ_BYTES	APPROXIMATE_SIZE(MB)	APPROXIMATE_KEYS	SCHEDULING_CONSTRAINTS	SCHEDULING_STATE
+275	t_112_	t_114_	276	1	276, 277, 278	0	39	0	1	0		
+REGION_ID	START_KEY	END_KEY	LEADER_ID	LEADER_STORE_ID	PEERS	SCATTERING	WRITTEN_BYTES	READ_BYTES	APPROXIMATE_SIZE(MB)	APPROXIMATE_KEYS	SCHEDULING_CONSTRAINTS	SCHEDULING_STATE
+279	t_114_	t_114_r_4	280	1	280, 281, 282	0	0	0	1	0		
+22	t_114_r_4	t_281474976710648_	23	1	23, 178, 256	0	825	0	1	0		
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813892,"commit_ts":470225814395813893,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813896,"commit_ts":470225814395813898,"txn_commit_mode":"async_commit","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813900,"commit_ts":470225814395813902,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813903,"commit_ts":470225814395813905,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":true,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813907,"commit_ts":470225814395813909,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813910,"commit_ts":470225814395813912,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":true,"pipelined":false,"flush_wait_ms":0}
+REGION_ID	START_KEY	END_KEY	LEADER_ID	LEADER_STORE_ID	PEERS	SCATTERING	WRITTEN_BYTES	READ_BYTES	APPROXIMATE_SIZE(MB)	APPROXIMATE_KEYS	SCHEDULING_CONSTRAINTS	SCHEDULING_STATE
+275	t_112_	t_114_	276	1	276, 277, 278	0	39	0	1	0		
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813922,"commit_ts":470225814395813924,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814395813930,"commit_ts":470225814395813932,"txn_commit_mode":"2pc","async_commit_fallback":false,"one_pc_fallback":true,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814408921090,"commit_ts":470225814408921092,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
+@@tidb_last_txn_info
+{"txn_scope":"global","start_ts":470225814408921098,"commit_ts":470225814408921100,"txn_commit_mode":"1pc","async_commit_fallback":false,"one_pc_fallback":false,"pipelined":false,"flush_wait_ms":0}
