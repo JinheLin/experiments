@@ -189,15 +189,36 @@ def smt_large(rows, out):
     plt.close(fig)
 
 
+
+def numa_pairs(path, out):
+    with path.open() as file:
+        rows = list(csv.DictReader(file))
+    rounds = values(rows, "rep")
+    fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.25), layout="constrained")
+    for ax, metric, unit in zip(axes, ("qps", "p99_us"), ("Throughput (kQPS)", "P99 (ms)")):
+        for placement, color, label in (("local", BLUE, "Local DRAM"), ("remote", ORANGE, "Remote DRAM")):
+            ax.plot(rounds, values(rows, f"{placement}_{metric}", 1000), color=color, marker="o",
+                    markersize=4, label=label)
+        axis(ax, unit, unit, rounds)
+        ax.set(xlabel="Paired round", ylabel=None, ylim=(0, None))
+    axes[0].legend(frameon=False, fontsize=8)
+    fig.savefig(out / "numa-long.svg")
+    plt.close(fig)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("summary", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--numa-pairs", type=Path, help="render only the longer paired NUMA comparison")
     args = parser.parse_args()
-    with args.summary.open() as file:
-        rows = list(csv.DictReader(file))
     args.output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({"svg.fonttype": "none", "font.size": 9, "axes.titleweight": "bold"})
+    if args.numa_pairs:
+        numa_pairs(args.numa_pairs, args.output)
+        return
+    with args.summary.open() as file:
+        rows = list(csv.DictReader(file))
     scaling(rows, args.output)
     smt_large(rows, args.output)
     costs(rows, args.output)

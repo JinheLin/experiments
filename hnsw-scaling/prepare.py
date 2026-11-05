@@ -11,12 +11,16 @@ DIM = 768
 SIZES = (4_096, 65_536, 524_288)
 
 
-def export(source, target, rows):
+def export(source, target, rows, skip=0):
     partial = target.with_suffix(".partial")
     with partial.open("wb") as out:
         remaining = rows
         for batch in pq.ParquetFile(source).iter_batches(batch_size=8192, columns=["emb"]):
-            array = batch.column(0).slice(0, remaining)
+            if skip >= len(batch):
+                skip -= len(batch)
+                continue
+            array = batch.column(0).slice(skip, remaining)
+            skip = 0
             assert not array.null_count and np.all(np.diff(array.offsets) == DIM)
             vectors = np.asarray(array.flatten().to_numpy(), dtype="<f4")
             assert np.isfinite(vectors).all()
@@ -49,7 +53,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("dataset", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--ground-truth", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--ground-truth", action="store_true")
+    mode.add_argument("--held-out", action="store_true", help="export two query banks after the index prefix")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     train = args.output / "train.f32"
@@ -59,6 +65,10 @@ def main():
         test = np.fromfile(queries, dtype="<f4").reshape(-1, DIM)
         for rows in SIZES:
             exact(corpus, test, rows, args.output / f"truth-{rows}.csv")
+    elif args.held_out:
+        shard = args.dataset / "train-00-of-100.parquet"
+        for rows in (1000, 16_384):
+            export(shard, args.output / f"heldout-{rows}.f32", rows, skip=SIZES[-1])
     else:
         export(args.dataset / "train-00-of-100.parquet", train, SIZES[-1])
         export(args.dataset / "test.parquet", queries, 1000)

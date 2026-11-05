@@ -5,6 +5,7 @@ edition = "2021"
 
 [features]
 diagnostic = []
+slot-timing = ["diagnostic"]
 
 [dependencies]
 libc = "0.2"

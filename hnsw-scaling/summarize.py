@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from statistics import median
 
+from run import LOCAL, REMOTE
+
 KEYS = ("rows", "mode", "ef", "placement", "page_policy", "threads")
 SUITES = ("primary", "topology", "short", "slots", "smt", "replicas")
 BASIC = ("qps", "cpu_cores", "cpu_us_per_query", "host_idle_pct", "p50_us", "p95_us", "p99_us")
@@ -67,11 +69,11 @@ def derived(record):
     return row
 
 
-def write_csv(path, rows):
+def write_csv(path, rows, lineterminator="\r\n"):
     if rows:
         columns = list(dict.fromkeys(key for row in rows for key in row))
         with path.open("w", newline="") as file:
-            writer = csv.DictWriter(file, columns)
+            writer = csv.DictWriter(file, columns, lineterminator=lineterminator)
             writer.writeheader()
             writer.writerows(rows)
 
@@ -147,13 +149,89 @@ def latency(results):
     write_csv(results / "pebs-summary.csv", rows)
 
 
+
+def review_metrics(record):
+    row = derived(record)
+    seconds = float(record["seconds"])
+    row["involuntary_per_second"] = int(record["involuntary_switches"]) / seconds
+    row["voluntary_per_second"] = int(record["voluntary_switches"]) / seconds
+    for node in range(2):
+        workers = sum(
+            float(worker["busy_pct"]) / 100 for worker in record["workers"]
+            if int(worker["cpu"]) in (LOCAL, REMOTE)[node]
+        )
+        row[f"other_cpu_cores_n{node}"] = float(record[f"host_busy_n{node}"]) - workers
+    for line in record["core_perf"].splitlines():
+        if ",,ref-cycles:u," in line:
+            count, _, _, _, running, *_ = line.split(",")
+            cycles = row["cycles_per_query"] * int(record["completed"])
+            row["estimated_worker_ghz"] = 2.6 * cycles / float(count)
+            row["core_pmu_running_pct"] = min(row["core_pmu_running_pct"], float(running))
+    return row
+
+
+def review(results):
+    directory = results / "review"
+    rows = []
+    pairs = defaultdict(dict)
+    for path in sorted(directory.glob("*.jsonl")):
+        cells = defaultdict(list)
+        for line in path.read_text().splitlines():
+            record = json.loads(line)
+            cell = tuple(record[key] for key in KEYS)
+            rows_data = review_metrics(record)
+            cells[cell + (record.get("pressure", ""), int(record["query_count"]))].append((rows_data, record))
+            if path.stem == "numa-long":
+                pairs[record["rep"]][record["placement"]] = rows_data
+        for cell, repeats in sorted(cells.items()):
+            metrics = [row for row, _ in repeats]
+            qps = [row["qps"] for row in metrics]
+            p99 = [row["p99_us"] for row in metrics]
+            row = {
+                "experiment": path.stem, **dict(zip((*KEYS, "pressure", "query_count"), cell)),
+                "reps": len(repeats), **{key: median(metric[key] for metric in metrics) for key in metrics[0]},
+                "qps_min": min(qps), "qps_max": max(qps), "p99_us_min": min(p99), "p99_us_max": max(p99),
+            }
+            if "slot_wait_ns" in repeats[0][1]:
+                samples = [sample for _, record in repeats for sample in record["slot_wait_ns"]]
+                waits = sorted(take + put for take, put, _ in samples)
+                assert len(samples) == sum(row["samples"] for row, _ in repeats)
+                row.update(
+                    slot_samples=len(samples),
+                    take_wait_ns_p50=median(take for take, _, _ in samples),
+                    put_wait_ns_p50=median(put for _, put, _ in samples),
+                    slot_total_wait_ns_p99=waits[(len(waits) * 99 + 99) // 100 - 1],
+                    slot_wait_pct_sampled_wall=100 * sum(waits) / sum(ns for _, _, ns in samples),
+                )
+            rows.append(row)
+    write_csv(directory / "summary.csv", rows, lineterminator="\n")
+    comparisons = []
+    for rep, pair in sorted(pairs.items()):
+        if len(pair) < 2:
+            continue
+        local, remote = pair["local"], pair["remote"]
+        comparisons.append({
+            "rep": rep, "order": "local-remote" if rep % 2 else "remote-local",
+            "local_qps": local["qps"], "remote_qps": remote["qps"],
+            "remote_qps_change_pct": 100 * (remote["qps"] / local["qps"] - 1),
+            "local_p99_us": local["p99_us"], "remote_p99_us": remote["p99_us"],
+            "remote_p99_change_pct": 100 * (remote["p99_us"] / local["p99_us"] - 1),
+        })
+    write_csv(directory / "numa-pairs.csv", comparisons, lineterminator="\n")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("results", type=Path)
+    parser.add_argument("--review-only", action="store_true")
     args = parser.parse_args()
+    if args.review_only:
+        review(args.results)
+        return
     benchmark(args.results)
     bandwidth(args.results)
     latency(args.results)
+    review(args.results)
 
 
 if __name__ == "__main__":

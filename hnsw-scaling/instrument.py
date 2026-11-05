@@ -13,10 +13,90 @@ def patch(path, changes):
     path.write_text(source)
 
 
+
+def instrument_slot_wait(crate, rust):
+    patch(crate / "include/usearch/index_dense.hpp", [
+        ('#include "index.hpp"', '#include "index.hpp"\n#include <chrono>'),
+        (
+            "template <typename, typename> class index_dense_gt;",
+            """struct slot_wait_sample_t {
+    std::uint64_t take_ns = 0, put_ns = 0;
+};
+inline thread_local slot_wait_sample_t* active_slot_wait_sample = nullptr;
+using slot_wait_clock_t = std::chrono::steady_clock;
+
+template <typename, typename> class index_dense_gt;""",
+        ),
+        (
+            "        std::unique_lock<std::mutex> lock(available_threads_mutex_);\n        if (!available_threads_.try_pop(thread_id))",
+            """        auto* sample = active_slot_wait_sample;
+        auto start = sample ? slot_wait_clock_t::now() : slot_wait_clock_t::time_point{};
+        std::unique_lock<std::mutex> lock(available_threads_mutex_);
+        if (sample)
+            sample->take_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(slot_wait_clock_t::now() - start).count();
+        if (!available_threads_.try_pop(thread_id))""",
+        ),
+        (
+            "        available_threads_mutex_.lock();\n        usearch_assert_m",
+            """        auto* sample = active_slot_wait_sample;
+        auto start = sample ? slot_wait_clock_t::now() : slot_wait_clock_t::time_point{};
+        available_threads_mutex_.lock();
+        if (sample)
+            sample->put_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(slot_wait_clock_t::now() - start).count();
+        usearch_assert_m""",
+        ),
+    ])
+    patch(rust / "lib.rs", [
+        (
+            '    unsafe extern "C++" {\n        include!("lib.hpp");',
+            """    struct SlotWait {
+        take_ns: u64,
+        put_ns: u64,
+    }
+
+    unsafe extern "C++" {
+        include!("lib.hpp");
+        pub fn begin_slot_wait_sample();
+        pub fn end_slot_wait_sample() -> SlotWait;""",
+        ),
+        (
+            "pub fn hardware_acceleration_compiled() -> String {",
+            """pub fn begin_slot_wait_sample() { ffi::begin_slot_wait_sample(); }
+pub fn end_slot_wait_sample() -> (u64, u64) {
+    let sample = ffi::end_slot_wait_sample();
+    (sample.take_ns, sample.put_ns)
+}
+
+pub fn hardware_acceleration_compiled() -> String {""",
+        ),
+    ])
+    patch(rust / "lib.hpp", [
+        ("struct Matches;", "struct Matches;\nstruct SlotWait;\nvoid begin_slot_wait_sample();\nSlotWait end_slot_wait_sample();"),
+    ])
+    patch(rust / "lib.cpp", [
+        (
+            "using index_t = index_dense_t;",
+            """static thread_local slot_wait_sample_t slot_wait_storage;
+
+void begin_slot_wait_sample() {
+    slot_wait_storage = {};
+    active_slot_wait_sample = &slot_wait_storage;
+}
+SlotWait end_slot_wait_sample() {
+    active_slot_wait_sample = nullptr;
+    return {slot_wait_storage.take_ns, slot_wait_storage.put_ns};
+}
+
+using index_t = index_dense_t;""",
+        ),
+    ])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("crate", type=Path, help="unmodified usearch-2.25.3 crate")
     parser.add_argument("output", type=Path)
+    parser.add_argument("--slot-timing", action="store_true")
     args = parser.parse_args()
     dest = args.output / "usearch"
     shutil.copytree(args.crate, dest)
@@ -62,6 +142,8 @@ def main():
             "Matches NativeIndex::search_f32_on_slot(rust::Slice<float const> vec, size_t count, size_t slot) const { return search_(*index_, vec.data(), vec.size(), count, false, slot); }",
         ),
     ])
+    if args.slot_timing:
+        instrument_slot_wait(dest, rust)
     root = Path(__file__).resolve().parent
     manifest = (root / "Cargo.toml").read_text().replace(
         'name = "hnsw-scaling"', 'name = "hnsw-scaling-diagnostic"'

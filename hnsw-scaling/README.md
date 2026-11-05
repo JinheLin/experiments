@@ -47,7 +47,7 @@ python3 run.py smt results/smt.jsonl --imc --seconds 2 --warmup .6
 
 Use a fresh output filename when repeating a run. Each suite runs three serial passes through a seeded shuffle of its cells. The two placement controls are independent. Workers can move between sockets, and the file pages can move from one-node placement to interleave. With `--imc`, the runner uses `sudo -n perf stat -a` for the socket memory controllers, then starts the workload under the original user. Omit `--imc` to run the benchmark using only per-process counters. The host needs access to user-space CPU counters in either case. Run the suites serially to avoid overlap.
 
-Each pinned worker repeatedly calls the Rust API synchronously with one request in flight, using a fixed shuffled query order with a worker-specific starting offset. The warmup and index setup are outside the measured window. Search expansion is 64 except for the short-query suite, which uses 16. Every successful call must return ten matches. The harness samples every 67th call for wall-clock latency and measures per-worker CPU time with `getrusage(RUSAGE_THREAD)`. It records whole-host idle and I/O-wait ticks from `/proc/stat`. The workload uses a closed loop, so these latency quantiles describe calls issued by this benchmark and exclude client-side queuing at a separately imposed arrival rate.
+Each pinned worker repeatedly calls the Rust API synchronously with one request in flight, using a fixed shuffled query order with a worker-specific starting offset. The warmup and index setup are outside the measured window. Search expansion is 64 except for the short-query suite, which uses 16. Every successful call must return ten matches. By default, the harness samples every 67th call for wall-clock latency and measures per-worker CPU time with `getrusage(RUSAGE_THREAD)`. It records whole-host idle and I/O-wait ticks from `/proc/stat`. The workload uses a closed loop, so these latency quantiles describe calls issued by this benchmark and exclude client-side queuing at a separately imposed arrival rate.
 
 A shared Index reserves one USearch context per worker. With an Index per worker, each worker uses its own one-context Index view of the same file. Views share file pages and have separate lookup tables, scratch contexts, mutexes and virtual mappings. A second experiment isolates the slot mutex using one shared mapping.
 
@@ -98,3 +98,47 @@ uv run --no-project --with matplotlib==3.11.2 python plot.py results/summary.csv
 ```
 
 Check that all three SHA-256 values match. The runner checks file page distribution per view and captures system-wide UPI transmitted data flits alongside IMC reads. The summary counts eight payload bytes per valid flit and adds the transmit directions of both sockets. Traffic includes the rest of the host. [Intel Cascade Lake uncore events](https://perfmon-events.intel.com/platforms/cascadelakex/uncore-events/uncore/)
+
+## Review follow-ups on the large index
+
+These runs reuse the same 524,288-vector graph and keep the follow-up data in `results/review/`. The longer NUMA comparison alternates local and remote placement across eight pairs, giving a Local–Remote–Remote–Local order. The graph pages stay on node 0. Each window runs for 20 seconds and times one in four closed-loop searches.
+
+```bash
+mkdir -p results/review
+bash build.sh --offline
+python3 run.py numa-long results/review/numa-long.jsonl \
+  --repeat 8 --seconds 20 --warmup 2 --imc --telemetry --latency-stride 4
+python3 run.py replica-long results/review/replica-long.jsonl \
+  --repeat 4 --seconds 12 --warmup 2 --imc --telemetry --latency-stride 4
+
+"$py" prepare.py "$dataset" data --held-out
+sha256sum data/queries.f32 data/heldout-*.f32 > results/review/query-sha256.txt
+for rows in 1000 16384; do
+  python3 run.py replica-long "results/review/heldout-$rows.jsonl" \
+    --queries "data/heldout-$rows.f32" --seconds 8 --warmup 2 --imc --telemetry --latency-stride 4
+done
+
+gcc -O3 -march=cascadelake -fopenmp -o target/stream-read stream-read.c
+python3 pressure.py results/review/pressure.jsonl --seconds 8
+```
+
+The held-out banks use the first 1,000 and 16,384 vectors after the indexed prefix of the same training shard. Both banks search the original graph. Dual-socket runs now load a copy of the query bank on each socket before timing. The memory-interference test keeps 18 search workers on node 0. An eight-thread reader uses disjoint cores on node 1. Its 1.5 GiB buffer is bound and verified on either node 1 for the separate-controller control or node 0 for shared-controller pressure. The latter also adds UPI traffic.
+
+The runner checks index pages again after timing. It records context switches, worker runtime and aggregate per-socket busy time. The review summary estimates non-worker CPU load by subtracting measured worker runtime from the relevant socket's busy time. Active user-space frequency is estimated from the ratio of core to reference cycles and the host's 2.60 GHz reference frequency. IMC and UPI counts include host traffic. [Intel counter definitions](https://perfmon-events.intel.com/platforms/cascadelakex/core-events/core/)
+
+The slot timing runs use a separate diagnostic build. They time the two mutex acquisitions in a sampled query, including the lock call and any time the caller spends waiting to run. The timer readings add a small cost. This probe measures the lock acquisition path, while the fixed-slot experiment also changes how workers reuse their query contexts.
+
+```bash
+crate=$(echo "${CARGO_HOME:-$HOME/.cargo}"/registry/src/*/usearch-2.25.3)
+python3 instrument.py "$crate" diagnostic-slot --slot-timing
+base="$PWD"
+(
+  cd diagnostic-slot
+  CARGO_TARGET_DIR="$base/target" bash "$base/build.sh" --offline --features slot-timing
+)
+python3 run.py slot-audit results/review/slot-audit.jsonl \
+  --binary target/release/hnsw-scaling-diagnostic --seconds 5 --warmup 1.5 --latency-stride 257
+python3 summarize.py results --review-only
+uv run --no-project --with matplotlib==3.11.2 python plot.py \
+  results/summary.csv figures --numa-pairs results/review/numa-pairs.csv
+```

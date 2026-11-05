@@ -36,6 +36,12 @@ def matrix(suite):
         ):
             for threads in counts:
                 yield SIZES[-1], "shared", 64, placement, pages, threads
+    elif suite == "numa-long":
+        for placement in ("local", "remote"):
+            yield SIZES[-1], "shared", 64, placement, "node0", 18
+    elif suite == "replica-long":
+        for threads in (54, 72):
+            yield SIZES[-1], "pair", 64, "spread", "replica", threads
     elif suite == "replicas":
         for pages, threads in itertools.product(("interleave", "replica"), (18, 36, 54, 64, 72)):
             yield SIZES[-1], "pair", 64, "spread", pages, threads
@@ -48,6 +54,15 @@ def matrix(suite):
     elif suite == "smt":
         for size, placement in itertools.product((SIZES[0], SIZES[-1]), ("local", "local-smt")):
             yield size, "shared", 64, placement, "node0", 18
+    elif suite == "slot-audit":
+        for mode, placement, pages, threads in (
+            ("shared", "local", "node0", 36),
+            ("shared", "spread", "interleave", 54),
+            ("shared", "spread", "interleave", 72),
+            ("pair", "spread", "replica", 54),
+            ("pair", "spread", "replica", 72),
+        ):
+            yield SIZES[-1], mode, 64, placement, pages, threads
     elif suite == "slots":
         for size, placement, pages, threads in (
             (4096, "local", "node0", 1),
@@ -78,7 +93,7 @@ def run_cell(case, rep, args):
     }[placement]
     cmd = [
         "numactl", f"--physcpubind={cpus[0]}", policy, str(args.binary.resolve()),
-        "bench", str(index), str(args.data / "queries.f32"), mode, str(ef),
+        "bench", str(index), str(args.queries or args.data / "queries.f32"), mode, str(ef),
         ",".join(map(str, cpus)), str(args.seconds), str(args.warmup),
     ]
     if mode == "pair":
@@ -91,9 +106,10 @@ def run_cell(case, rep, args):
         os.mkfifo(core_ack)
         core_stat = directory / "core.csv"
         ctl = f"{core_ctl},{core_ack}"
+        events = f"{EVENTS},ref-cycles:u" if args.telemetry else EVENTS
         cmd = [
-            "env", f"HNSW_PERF_FIFOS={ctl}", "perf", "stat", "-x,", "--delay=-1",
-            f"--control=fifo:{ctl}", "-o", str(core_stat), "-e", EVENTS, "--", *cmd,
+            "env", f"HNSW_PERF_FIFOS={ctl}", f"HNSW_LATENCY_STRIDE={args.latency_stride}", "perf", "stat", "-x,", "--delay=-1",
+            f"--control=fifo:{ctl}", "-o", str(core_stat), "-e", events, "--", *cmd,
         ]
         if args.imc:
             imc_ctl, imc_ack = directory / "imc-ctl", directory / "imc-ack"
@@ -104,10 +120,10 @@ def run_cell(case, rep, args):
             cmd[1] += f" {imc_pair}"
             cmd = [
                 "sudo", "-n", "perf", "stat", "-a", "-A", "-x,", "--delay=-1",
-                f"--control=fifo:{imc_pair}", "-o", str(imc_stat), "-e", f"{IMC},{UPI}" if args.suite == "replicas" else IMC, "--",
+                f"--control=fifo:{imc_pair}", "-o", str(imc_stat), "-e", f"{IMC},{UPI}" if args.suite in ("replicas", "numa-long", "replica-long") else IMC, "--",
                 "sudo", "-n", "-u", os.environ["USER"], "--", *cmd,
             ]
-        result = subprocess.run(cmd, check=False, text=True, capture_output=True, timeout=120)
+        result = subprocess.run(cmd, check=False, text=True, capture_output=True, timeout=max(120, args.seconds + args.warmup + 60))
         if result.returncode:
             raise RuntimeError(f"{case}\n{result.stdout}\n{result.stderr}")
         header, metrics = result.stdout.strip().splitlines()
@@ -124,6 +140,19 @@ def run_cell(case, rep, args):
                 if not (fraction >= 0.95 if pages == "replica" else 0.45 <= fraction <= 0.55):
                     raise RuntimeError(f"{case} view {node} has {fraction:.1%} local pages")
             record["per_view_numa_pages"] = per_view
+        post = next(line for line in result.stderr.splitlines() if line.startswith("post_view_pages="))
+        post_views = [list(map(int, part.split(","))) for part in post.split("=", 1)[1].split(";")]
+        for node, counts in enumerate(post_views):
+            fraction = counts[node] / sum(counts)
+            if not (0.45 <= fraction <= 0.55 if pages == "interleave" else fraction >= 0.95):
+                raise RuntimeError(f"{case} view {node} ended with {fraction:.1%} local pages")
+        record["post_view_numa_pages"] = post_views
+        wait_samples = [list(map(int, line.split("=", 1)[1].split(",")))
+                        for line in result.stderr.splitlines() if line.startswith("slot_wait_ns=")]
+        if args.suite == "slot-audit" and not wait_samples:
+            raise RuntimeError("slot-audit requires a binary built with --features slot-timing")
+        if wait_samples:
+            record["slot_wait_ns"] = wait_samples
         return {
             "rep": rep, "mode": mode, "ef": ef, "placement": placement,
             "page_policy": pages, "threads": threads, "cpus": cpus, **record,
@@ -134,7 +163,7 @@ def run_cell(case, rep, args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("suite", choices=("primary", "topology", "short", "slots", "smt", "replicas"))
+    parser.add_argument("suite", choices=("primary", "topology", "short", "slots", "smt", "replicas", "numa-long", "replica-long", "slot-audit"))
     parser.add_argument("output", type=Path)
     parser.add_argument("--data", type=Path, default=Path("data"))
     parser.add_argument("--binary", type=Path, default=Path("target/release/hnsw-scaling"))
@@ -142,13 +171,20 @@ def main():
     parser.add_argument("--seconds", type=float, default=2)
     parser.add_argument("--warmup", type=float, default=0.75)
     parser.add_argument("--imc", action="store_true")
+    parser.add_argument("--queries", type=Path)
+    parser.add_argument("--latency-stride", type=int, default=67)
+    parser.add_argument("--telemetry", action="store_true", help="also collect user-space reference cycles")
     parser.add_argument("--rows", type=int, choices=SIZES)
     args = parser.parse_args()
     cases = [case for case in matrix(args.suite) if args.rows in (None, case[0])]
     with args.output.open("x", buffering=1) as out:
         for rep in range(1, args.repeat + 1):
-            random.Random(85969 + rep).shuffle(cases)
-            for case in cases:
+            if args.suite.endswith("-long"):
+                ordered = cases if rep % 2 else reversed(cases)
+            else:
+                random.Random(85969 + rep).shuffle(cases)
+                ordered = cases
+            for case in ordered:
                 record = run_cell(case, rep, args)
                 print(f"{rep} {case} {float(record['qps']):,.0f} QPS", flush=True)
                 out.write(json.dumps(record) + "\n")

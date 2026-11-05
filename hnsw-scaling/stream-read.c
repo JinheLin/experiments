@@ -16,7 +16,7 @@ static void bind_range(void *start, size_t length, int policy, unsigned long nod
     }
 }
 
-static void verify_pages(void *start, size_t length, int dual) {
+static void verify_pages(void *start, size_t length, int layout) {
     FILE *maps = fopen("/proc/self/numa_maps", "r");
     if (!maps) {
         perror("numa_maps");
@@ -36,7 +36,7 @@ static void verify_pages(void *start, size_t length, int dual) {
     fclose(maps);
     unsigned long expected = length / (size_t)sysconf(_SC_PAGESIZE);
     unsigned long tolerance = expected / 1000;
-    unsigned long target_n0 = dual ? expected / 2 : expected;
+    unsigned long target_n0 = layout < 0 ? expected / 2 : layout == 0 ? expected : 0;
     unsigned long target_n1 = expected - target_n0;
     if (n0 + tolerance < target_n0 || n0 > target_n0 + tolerance ||
         n1 + tolerance < target_n1 || n1 > target_n1 + tolerance) {
@@ -47,11 +47,14 @@ static void verify_pages(void *start, size_t length, int dual) {
 }
 
 int main(int argc, char **argv) {
-    if (argc != 2) {
-        fprintf(stderr, "usage: stream-read node0|dual|dual-local\n");
+    if (argc < 2 || argc > 3) {
+        fprintf(stderr, "usage: stream-read node0|node1|dual|dual-local [SECONDS]\n");
         return 1;
     }
-    int dual = strcmp(argv[1], "node0") != 0;
+    double duration = argc == 3 ? atof(argv[2]) : 4.0;
+    if (!(duration > 0))
+        return 1;
+    int layout = strcmp(argv[1], "node0") == 0 ? 0 : strcmp(argv[1], "node1") == 0 ? 1 : -1;
     size_t length = (size_t)1536 * 1024 * 1024;
     size_t elements = length / sizeof(uint64_t);
     uint64_t *data = mmap(NULL, length, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
@@ -66,8 +69,8 @@ int main(int argc, char **argv) {
     } else if (strcmp(argv[1], "dual-local") == 0) {
         bind_range(data, length / 2, MPOL_BIND, 1);
         bind_range(data + elements / 2, length / 2, MPOL_BIND, 2);
-    } else if (!dual) {
-        bind_range(data, length, MPOL_BIND, 1);
+    } else if (layout >= 0) {
+        bind_range(data, length, MPOL_BIND, 1UL << layout);
     } else {
         return 1;
     }
@@ -82,6 +85,13 @@ int main(int argc, char **argv) {
         for (size_t i = first; i < end; ++i)
             data[i] = i;
         #pragma omp barrier
+        if (argc == 3) {
+            #pragma omp single
+            {
+                verify_pages(data, length, layout);
+                fflush(stdout);
+            }
+        }
         double start = omp_get_wtime();
         do {
             // Make each pass observable to the optimizer while leaving memory read-only.
@@ -92,13 +102,13 @@ int main(int argc, char **argv) {
                 local += data[i];
             checksum += local;
             bytes += (end - first) * sizeof(*data);
-        } while (omp_get_wtime() - start < 4.0);
+        } while (omp_get_wtime() - start < duration);
         #pragma omp barrier
         #pragma omp master
         elapsed = omp_get_wtime() - start;
     }
     printf("seconds=%.6f,read_GiB_per_sec=%.3f,checksum=%" PRIu64 "\n",
            elapsed, bytes / elapsed / (1024 * 1024 * 1024), checksum);
-    verify_pages(data, length, dual);
+    verify_pages(data, length, layout);
     munmap(data, length);
 }
