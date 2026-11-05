@@ -1,0 +1,125 @@
+label,rep,source,samples,p50_cycles,p95_cycles
+interleave-36,1,L1 hit,278,170.5,935
+interleave-36,1,L2 hit,192,36.0,71
+interleave-36,1,L3 hit,335,167,787
+interleave-36,1,L3 miss,23,211,728
+interleave-36,1,LFB/MAB hit,5002,223.0,881
+interleave-36,1,RAM hit,215,226,763
+interleave-36,1,Remote Any cache hit,21,202,500
+interleave-36,1,Remote RAM hit,157,379,992
+interleave-36,2,L1 hit,329,124,898
+interleave-36,2,L2 hit,132,36.0,109
+interleave-36,2,L3 hit,485,167,737
+interleave-36,2,L3 miss,9,236,544
+interleave-36,2,LFB/MAB hit,5210,201.0,803
+interleave-36,2,RAM hit,166,238.5,686
+interleave-36,2,Remote Any cache hit,29,350,603
+interleave-36,2,Remote RAM hit,114,361.0,959
+interleave-36,3,L1 hit,306,193.0,875
+interleave-36,3,L2 hit,174,36.0,97
+interleave-36,3,L3 hit,382,166.0,710
+interleave-36,3,L3 miss,16,244.0,710
+interleave-36,3,LFB/MAB hit,5091,207,836
+interleave-36,3,RAM hit,183,235,934
+interleave-36,3,Remote Any cache hit,27,297,773
+interleave-36,3,Remote RAM hit,140,395.5,869
+local-1,1,L1 hit,13,273,1240
+local-1,1,L2 hit,8,36.0,52
+local-1,1,L3 hit,2,161.5,288
+local-1,1,LFB/MAB hit,197,167,540
+local-1,1,RAM hit,33,198,658
+local-1,2,L1 hit,14,63.0,1111
+local-1,2,L2 hit,7,34,82
+local-1,2,L3 hit,2,59.5,60
+local-1,2,LFB/MAB hit,192,173.0,740
+local-1,2,RAM hit,33,207,885
+local-1,3,L1 hit,10,51.0,772
+local-1,3,L2 hit,8,34.5,47
+local-1,3,L3 hit,2,67.0,72
+local-1,3,LFB/MAB hit,202,139.5,571
+local-1,3,RAM hit,20,211.0,576
+local-18,1,L1 hit,177,144,648
+local-18,1,L2 hit,109,36,63
+local-18,1,L3 hit,239,139,498
+local-18,1,LFB/MAB hit,3055,183,646
+local-18,1,RAM hit,231,215,621
+local-18,2,L1 hit,195,119,597
+local-18,2,L2 hit,101,36,53
+local-18,2,L3 hit,252,158.5,550
+local-18,2,LFB/MAB hit,3121,178,678
+local-18,2,RAM hit,241,217,583
+local-18,3,L1 hit,186,87.0,732
+local-18,3,L2 hit,95,36,67
+local-18,3,L3 hit,270,162.5,518
+local-18,3,LFB/MAB hit,3073,175,634
+local-18,3,RAM hit,254,219.0,756
+local-36,1,L1 hit,165,73,748
+local-36,1,L2 hit,99,38,210
+local-36,1,L3 hit,145,195,733
+local-36,1,LFB/MAB hit,3122,188.0,739
+local-36,1,RAM hit,155,353,1052
+local-36,2,L1 hit,189,76,839
+local-36,2,L2 hit,107,37,149
+local-36,2,L3 hit,160,209.0,718
+local-36,2,LFB/MAB hit,3594,190.0,744
+local-36,2,RAM hit,201,328,862
+local-36,3,L1 hit,154,71.0,780
+local-36,3,L2 hit,91,38,167
+local-36,3,L3 hit,133,211,803
+local-36,3,LFB/MAB hit,3624,188.0,743
+local-36,3,RAM hit,203,349,1023
+remote-18,1,L1 hit,141,154,835
+remote-18,1,L2 hit,69,35,68
+remote-18,1,L3 hit,204,213.5,816
+remote-18,1,LFB/MAB hit,2370,274.0,842
+remote-18,1,RAM hit,20,242.5,581
+remote-18,1,Remote RAM hit,99,387,909
+remote-18,2,L1 hit,140,205.5,841
+remote-18,2,L2 hit,63,36,80
+remote-18,2,L3 hit,263,198,755
+remote-18,2,LFB/MAB hit,2581,254,805
+remote-18,2,RAM hit,12,244.5,355
+remote-18,2,Remote RAM hit,78,362.0,830
+remote-18,3,L1 hit,137,184,898
+remote-18,3,L2 hit,67,36,78
+remote-18,3,L3 hit,214,218.0,695
+remote-18,3,LFB/MAB hit,2398,279.5,857
+remote-18,3,RAM hit,15,242,684
+remote-18,3,Remote RAM hit,121,380,907
+replica-54,1,L1 hit,401,63,646
+replica-54,1,L2 hit,248,35.0,73
+replica-54,1,L3 hit,517,139,533
+replica-54,1,L3 miss,1,34,34
+replica-54,1,LFB/MAB hit,6455,147,670
+replica-54,1,RAM hit,320,232.0,756
+replica-54,1,Remote RAM hit,3,452,851
+replica-54,2,L1 hit,340,74.0,765
+replica-54,2,L2 hit,232,36.0,79
+replica-54,2,L3 hit,452,150.5,601
+replica-54,2,L3 miss,2,35.5,37
+replica-54,2,LFB/MAB hit,5895,157,751
+replica-54,2,RAM hit,320,231.5,723
+replica-54,2,Remote RAM hit,2,385.0,408
+replica-54,3,L1 hit,338,67.0,712
+replica-54,3,L2 hit,220,36.0,83
+replica-54,3,L3 hit,508,147.5,682
+replica-54,3,LFB/MAB hit,6010,157.0,771
+replica-54,3,RAM hit,303,231,845
+replica-72,1,L1 hit,261,101,815
+replica-72,1,L2 hit,148,37.0,188
+replica-72,1,L3 hit,142,111.5,659
+replica-72,1,LFB/MAB hit,6526,194.0,789
+replica-72,1,RAM hit,470,354.5,1045
+replica-72,1,Remote RAM hit,2,475.5,481
+replica-72,2,L1 hit,280,133.5,924
+replica-72,2,L2 hit,180,38.0,180
+replica-72,2,L3 hit,137,108,616
+replica-72,2,LFB/MAB hit,6921,199,810
+replica-72,2,RAM hit,485,346,929
+replica-72,2,Remote RAM hit,1,481,481
+replica-72,3,L1 hit,338,110.5,881
+replica-72,3,L2 hit,194,39.0,122
+replica-72,3,L3 hit,182,123.5,597
+replica-72,3,LFB/MAB hit,7187,196,789
+replica-72,3,RAM hit,472,367.5,940
+replica-72,3,Remote RAM hit,1,396,396

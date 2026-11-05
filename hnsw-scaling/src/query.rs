@@ -1,0 +1,409 @@
+use super::{new_index, vectors, Result, DIM, K};
+use std::fs::{self, File, OpenOptions};
+use std::hint::black_box;
+use std::io::{BufRead, BufReader, Write};
+use std::path::Path;
+use std::sync::{Barrier, OnceLock};
+use std::thread;
+use std::time::{Duration, Instant};
+use usearch::Index;
+
+struct Perf {
+    control: File,
+    ack: BufReader<File>,
+}
+
+impl Perf {
+    fn open() -> Result<Vec<Self>> {
+        let spec = std::env::var("HNSW_PERF_FIFOS").unwrap_or_default();
+        spec.split_whitespace()
+            .map(|pair| {
+                let (control, ack) = pair.split_once(',').ok_or("expected CONTROL,ACK")?;
+                Ok(Self {
+                    control: OpenOptions::new().write(true).open(control)?,
+                    ack: BufReader::new(File::open(ack)?),
+                })
+            })
+            .collect()
+    }
+
+    fn command(&mut self, command: &str) -> Result<()> {
+        writeln!(self.control, "{command}")?;
+        let mut line = String::new();
+        self.ack.read_line(&mut line)?;
+        if line.trim_matches(|c: char| c == '\0' || c.is_ascii_whitespace()) != "ack" {
+            return Err(format!("unexpected perf reply {line:?}").into());
+        }
+        Ok(())
+    }
+}
+
+fn pin(cpu: usize) -> std::io::Result<()> {
+    // SAFETY: the CPU set is initialized before it is passed to the kernel.
+    unsafe {
+        let mut set: libc::cpu_set_t = std::mem::zeroed();
+        libc::CPU_SET(cpu, &mut set);
+        if libc::sched_setaffinity(0, size_of::<libc::cpu_set_t>(), &set) != 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+    }
+    Ok(())
+}
+
+fn usage() -> libc::rusage {
+    // SAFETY: getrusage writes into valid storage and uses the calling thread.
+    unsafe {
+        let mut usage = std::mem::zeroed();
+        assert_eq!(libc::getrusage(libc::RUSAGE_THREAD, &mut usage), 0);
+        usage
+    }
+}
+
+fn cpu_seconds(usage: &libc::rusage) -> f64 {
+    (usage.ru_utime.tv_sec + usage.ru_stime.tv_sec) as f64
+        + (usage.ru_utime.tv_usec + usage.ru_stime.tv_usec) as f64 / 1e6
+}
+
+fn open_view(path: &str, ef: usize, slots: usize) -> Result<Index> {
+    let index = new_index(ef)?;
+    index.reserve_capacity_and_threads(0, slots)?;
+    index.view(path)?;
+    assert_eq!(index.expansion_search(), ef);
+    Ok(index)
+}
+
+fn prefault(path: &Path, expected_maps: usize) -> Result<(u64, u64)> {
+    let path = path.to_str().ok_or("invalid index path")?;
+    let mut maps = 0;
+    for line in fs::read_to_string("/proc/self/maps")?
+        .lines()
+        .filter(|line| line.ends_with(path))
+    {
+        let (lo, hi) = line
+            .split_whitespace()
+            .next()
+            .unwrap()
+            .split_once('-')
+            .unwrap();
+        let lo = usize::from_str_radix(lo, 16)?;
+        let hi = usize::from_str_radix(hi, 16)?;
+        // SAFETY: the index mappings remain live for this entire call.
+        if unsafe { libc::madvise(lo as *mut libc::c_void, hi - lo, libc::MADV_POPULATE_READ) } != 0
+        {
+            return Err(std::io::Error::last_os_error().into());
+        }
+        maps += 1;
+    }
+    assert_eq!(maps, expected_maps);
+    let mut pages = [0; 2];
+    for line in fs::read_to_string("/proc/self/numa_maps")?
+        .lines()
+        .filter(|line| line.contains(path))
+    {
+        for token in line.split_whitespace() {
+            for (node, total) in pages.iter_mut().enumerate() {
+                if let Some(count) = token.strip_prefix(&format!("N{node}=")) {
+                    *total += count.parse::<u64>()?;
+                }
+            }
+        }
+    }
+    assert!(pages.iter().sum::<u64>() > 0);
+    Ok((pages[0], pages[1]))
+}
+
+fn recall(index: &Index, queries: &[f32], truth: &str) -> Result<()> {
+    let gt = fs::read_to_string(truth)?;
+    let mut hits = 0;
+    let mut count = 0;
+    for (query, line) in queries.chunks_exact(DIM).zip(gt.lines()) {
+        let keys = line
+            .split(',')
+            .map(str::parse::<u64>)
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        let result = index.search(query, K)?;
+        assert_eq!(keys.len(), K);
+        assert_eq!(result.keys.len(), K);
+        hits += result.keys.iter().filter(|key| keys.contains(key)).count();
+        count += 1;
+    }
+    assert_eq!(count, queries.len() / DIM);
+    assert_eq!(count, gt.lines().count());
+    println!(
+        "queries={count},recall_at_10={:.6},kernel={}",
+        hits as f64 / (count * K) as f64,
+        index.hardware_acceleration()
+    );
+    Ok(())
+}
+
+#[cfg(feature = "diagnostic")]
+fn graph_work(index: &Index, queries: &[f32]) -> Result<()> {
+    let mut visited = 0;
+    let mut distances = 0;
+    for query in queries.chunks_exact(DIM) {
+        let pooled = index.search(query, K)?;
+        // SAFETY: this loop is serial and no other code accesses slot 0.
+        let explicit = unsafe { index.search_f32_on_slot(query, K, 0)? };
+        assert_eq!(pooled.keys, explicit.keys);
+        assert_eq!(pooled.distances, explicit.distances);
+        assert_eq!(pooled.visited, explicit.visited);
+        assert_eq!(pooled.computed, explicit.computed);
+        visited += explicit.visited;
+        distances += explicit.computed;
+    }
+    let count = queries.len() / DIM;
+    println!(
+        "queries={count},visited_per_query={:.3},distances_per_query={:.3}",
+        visited as f64 / count as f64,
+        distances as f64 / count as f64
+    );
+    Ok(())
+}
+
+#[derive(Default)]
+struct Worker {
+    good: u64,
+    failed: u64,
+    short: u64,
+    cpu: f64,
+    minor: i64,
+    major: i64,
+    involuntary: i64,
+    latency_ns: Vec<u64>,
+}
+
+fn host_ticks() -> Result<(u64, u64)> {
+    let stat = fs::read_to_string("/proc/stat")?;
+    let ticks = stat
+        .lines()
+        .next()
+        .ok_or("missing aggregate CPU statistics")?
+        .split_whitespace()
+        .skip(1)
+        .take(8)
+        .map(str::parse::<u64>)
+        .collect::<std::result::Result<Vec<_>, _>>()?;
+    Ok((ticks.iter().sum(), ticks[3] + ticks[4]))
+}
+
+fn measure(
+    cpus: &[usize],
+    indexes: &[Index],
+    queries: &[f32],
+    duration: Duration,
+    warmup: Duration,
+    _mode: &str,
+) -> Result<()> {
+    let count = queries.len() / DIM;
+    let mut order: Vec<_> = (0..count).collect();
+    let mut random = 0x641d_5e4f_d21a_9bd1_u64;
+    for end in (1..count).rev() {
+        random ^= random << 13;
+        random ^= random >> 7;
+        random ^= random << 17;
+        order.swap(end, random as usize % (end + 1));
+    }
+
+    let ready = Barrier::new(cpus.len() + 1);
+    let gate = Barrier::new(cpus.len() + 1);
+    let start = OnceLock::new();
+    let mut perf = Perf::open()?;
+    let (workers, elapsed, host_idle_pct) = thread::scope(|scope| -> Result<_> {
+        let threads: Vec<_> = cpus
+            .iter()
+            .enumerate()
+            .map(|(id, &cpu)| {
+                let index = &indexes[id % indexes.len()];
+                let (ready, gate, start, order) = (&ready, &gate, &start, &order);
+                scope.spawn(move || {
+                    if let Err(err) = pin(cpu) {
+                        eprintln!("cannot pin worker {id} to CPU {cpu}: {err}");
+                        std::process::abort();
+                    }
+                    let mut pos = (id * 331) % count;
+                    let mut search = || {
+                        let offset = order[pos] * DIM;
+                        pos += 1;
+                        if pos == count {
+                            pos = 0;
+                        }
+                        let query = &queries[offset..offset + DIM];
+                        #[cfg(feature = "diagnostic")]
+                        if _mode == "explicit" {
+                            // SAFETY: each worker owns a distinct reserved slot.
+                            return unsafe { index.search_f32_on_slot(query, K, id) };
+                        }
+                        index.search(query, K)
+                    };
+                    let warm_until = Instant::now() + warmup;
+                    while Instant::now() < warm_until {
+                        if let Err(err) = black_box(search()) {
+                            eprintln!("warmup search failed: {err}");
+                            std::process::abort();
+                        }
+                    }
+
+                    let mut row = Worker {
+                        latency_ns: Vec::with_capacity(16_384),
+                        ..Worker::default()
+                    };
+                    ready.wait();
+                    gate.wait();
+                    let before = usage();
+                    let deadline = *start.get().unwrap() + duration;
+                    let mut sequence = id;
+                    while Instant::now() < deadline {
+                        for _ in 0..16 {
+                            let sampled = (sequence % 67 == 0).then(Instant::now);
+                            match search() {
+                                Ok(result) if result.keys.len() == K => {
+                                    black_box(result);
+                                    row.good += 1;
+                                    if let Some(sampled) = sampled {
+                                        row.latency_ns.push(sampled.elapsed().as_nanos() as u64);
+                                    }
+                                }
+                                Ok(_) => row.short += 1,
+                                Err(err) => {
+                                    if row.failed == 0 {
+                                        eprintln!("CPU {cpu} search failed: {err}");
+                                    }
+                                    row.failed += 1;
+                                }
+                            }
+                            sequence += 1;
+                        }
+                    }
+                    let after = usage();
+                    row.cpu = cpu_seconds(&after) - cpu_seconds(&before);
+                    row.minor = after.ru_minflt - before.ru_minflt;
+                    row.major = after.ru_majflt - before.ru_majflt;
+                    row.involuntary = after.ru_nivcsw - before.ru_nivcsw;
+                    row
+                })
+            })
+            .collect();
+        ready.wait();
+        let host_before = host_ticks();
+        let enabled = perf.iter_mut().try_for_each(|p| p.command("enable"));
+        let begin = Instant::now();
+        start.set(begin).unwrap();
+        gate.wait();
+        let rows: Vec<_> = threads
+            .into_iter()
+            .map(|worker| worker.join().unwrap())
+            .collect();
+        let elapsed = begin.elapsed();
+        let disabled = perf.iter_mut().try_for_each(|p| p.command("disable"));
+        enabled?;
+        disabled?;
+        let (total_before, idle_before) = host_before?;
+        let (total_after, idle_after) = host_ticks()?;
+        let idle_pct =
+            100.0 * (idle_after - idle_before) as f64 / (total_after - total_before) as f64;
+        Ok((rows, elapsed, idle_pct))
+    })?;
+
+    let mut latency: Vec<_> = workers
+        .iter()
+        .flat_map(|row| row.latency_ns.iter().copied())
+        .collect();
+    latency.sort_unstable();
+    let percentile = |p: usize| (latency[(latency.len() * p).div_ceil(100) - 1] as f64) / 1e3;
+    let good: u64 = workers.iter().map(|w| w.good).sum();
+    let failed: u64 = workers.iter().map(|w| w.failed).sum();
+    let short: u64 = workers.iter().map(|w| w.short).sum();
+    let cpu: f64 = workers.iter().map(|w| w.cpu).sum();
+    let minor: i64 = workers.iter().map(|w| w.minor).sum();
+    let major: i64 = workers.iter().map(|w| w.major).sum();
+    let involuntary: i64 = workers.iter().map(|w| w.involuntary).sum();
+    let seconds = elapsed.as_secs_f64();
+    if latency.is_empty() {
+        return Err("no latency samples".into());
+    }
+    println!("seconds={seconds:.6},completed={good},errors={failed},short={short},qps={:.3},cpu_cores={:.4},host_idle_pct={host_idle_pct:.3},cpu_us_per_query={:.4},p50_us={:.3},p95_us={:.3},p99_us={:.3},samples={},minor_faults={minor},major_faults={major},involuntary_switches={involuntary}",
+        good as f64 / seconds, cpu / seconds, 1e6 * cpu / good as f64,
+        percentile(50), percentile(95), percentile(99), latency.len());
+    for (&cpu_id, worker) in cpus.iter().zip(&workers) {
+        eprintln!(
+            "cpu={cpu_id},completed={},busy_pct={:.3},involuntary_switches={}",
+            worker.good,
+            100.0 * worker.cpu / seconds,
+            worker.involuntary
+        );
+    }
+    assert_eq!(failed + short, 0);
+    Ok(())
+}
+
+pub fn run(args: &[String]) -> Result<()> {
+    match args.get(1).map(String::as_str) {
+        #[cfg(feature = "diagnostic")]
+        Some("work") if args.len() == 5 => {
+            let index = open_view(&args[2], args[4].parse()?, 1)?;
+            let queries = vectors(Path::new(&args[3]), 1000)?;
+            graph_work(&index, &queries)
+        }
+        Some("recall") if args.len() == 6 => {
+            let index = open_view(&args[2], args[5].parse()?, 1)?;
+            let queries = vectors(Path::new(&args[3]), 1000)?;
+            recall(&index, &queries, &args[4])
+        }
+        Some("bench") if matches!(args.len(), 9 | 10) => {
+            let path = Path::new(&args[2]).canonicalize()?;
+            let queries = vectors(Path::new(&args[3]), 1000)?;
+            let cpus = args[6].split(',').map(str::parse::<usize>)
+                .collect::<std::result::Result<Vec<_>, _>>()?;
+            assert!(cpus.iter().all(|&cpu| cpu < libc::CPU_SETSIZE as usize));
+            let ef = args[5].parse()?;
+            let (indexes, slots, (pages0, pages1)) = if args[4] == "pair" {
+                let second = Path::new(args.get(9).ok_or("pair requires a second index path")?)
+                    .canonicalize()?;
+                if cpus.is_empty() || cpus.len() % 2 != 0 {
+                    return Err("pair requires alternating CPUs from both sockets".into());
+                }
+                let slots = cpus.len() / 2;
+                let mut indexes = Vec::with_capacity(2);
+                for (id, file) in [&path, &second].into_iter().enumerate() {
+                    pin(cpus[id])?;
+                    indexes.push(open_view(file.to_str().unwrap(), ef, slots)?);
+                }
+                pin(cpus[0])?;
+                let first_pages = prefault(&path, if path == second { 2 } else { 1 })?;
+                let (a, b) = if path == second {
+                    // Each VMA points at the same physical file pages.
+                    if first_pages.0 % 2 != 0 || first_pages.1 % 2 != 0 {
+                        return Err("paired mappings have inconsistent page counts".into());
+                    }
+                    let per_view = (first_pages.0 / 2, first_pages.1 / 2);
+                    (per_view, per_view)
+                } else {
+                    (first_pages, prefault(&second, 1)?)
+                };
+                eprintln!("view_pages={},{};{},{}", a.0, a.1, b.0, b.1);
+                (indexes, slots, (a.0 + b.0, a.1 + b.1))
+            } else {
+                if args.len() != 9 || cpus.is_empty() {
+                    return Err("bench requires CPUs and takes a second path only in pair mode".into());
+                }
+                let (maps, slots) = match args[4].as_str() {
+                    "shared" => (1, cpus.len()),
+                    #[cfg(feature = "diagnostic")]
+                    "explicit" => (1, cpus.len()),
+                    "private" => (cpus.len(), 1),
+                    _ => return Err("mode must be shared, private or pair".into()),
+                };
+                let indexes = (0..maps)
+                    .map(|_| open_view(path.to_str().unwrap(), ef, slots))
+                    .collect::<Result<Vec<_>>>()?;
+                (indexes, slots, prefault(&path, maps)?)
+            };
+            println!("rows={},maps={},slots_per_index={slots},mapped_pages_n0={pages0},mapped_pages_n1={pages1},kernel={}",
+                indexes[0].size(), indexes.len(), indexes[0].hardware_acceleration());
+            measure(&cpus, &indexes, &queries, Duration::from_secs_f64(args[7].parse()?),
+                Duration::from_secs_f64(args[8].parse()?), &args[4])
+        }
+        _ => Err("usage: build TRAIN INDEX ROWS WORKERS | recall INDEX QUERIES TRUTH EF | bench INDEX QUERIES MODE EF CPU-LIST SECONDS WARMUP [SECOND-INDEX]".into()),
+    }
+}

@@ -1,0 +1,11 @@
+[package]
+name = "hnsw-scaling"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+diagnostic = []
+
+[dependencies]
+libc = "0.2"
+usearch = "=2.25.3"

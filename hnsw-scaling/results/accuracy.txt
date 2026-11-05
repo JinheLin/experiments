@@ -1,0 +1,12 @@
+rows=4096,ef=16
+queries=1000,recall_at_10=0.934000,kernel=skylake
+queries=1000,visited_per_query=21.714,distances_per_query=285.574
+rows=4096,ef=64
+queries=1000,recall_at_10=0.990500,kernel=skylake
+queries=1000,visited_per_query=68.754,distances_per_query=690.104
+rows=65536,ef=64
+queries=1000,recall_at_10=0.980200,kernel=skylake
+queries=1000,visited_per_query=73.347,distances_per_query=894.111
+rows=524288,ef=64
+queries=1000,recall_at_10=0.964100,kernel=skylake
+queries=1000,visited_per_query=75.978,distances_per_query=962.828

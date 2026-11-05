@@ -1,0 +1,13 @@
+insert block 0/4096, 0.0s
+rows=4096,workers=12,kernel=skylake,seconds=0.130,bytes=13195152
+insert block 0/65536, 0.0s
+rows=65536,workers=12,kernel=skylake,seconds=4.373,bytes=211061796
+insert block 0/524288, 0.0s
+insert block 65536/524288, 4.2s
+insert block 131072/524288, 10.2s
+insert block 196608/524288, 15.9s
+insert block 262144/524288, 21.9s
+insert block 327680/524288, 28.1s
+insert block 393216/524288, 34.3s
+insert block 458752/524288, 40.6s
+rows=524288,workers=12,kernel=skylake,seconds=48.113,bytes=1688467064

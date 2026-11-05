@@ -1,0 +1,43 @@
+rows=524288,maps=1,slots_per_index=36,mapped_pages_n0=206112,mapped_pages_n1=206112,kernel=skylake
+seconds=2.515408,completed=94272,errors=0,short=0,qps=37477.817,cpu_cores=35.5058,host_idle_pct=41.946,cpu_us_per_query=947.3823,p50_us=939.456,p95_us=1307.663,p99_us=1518.320,samples=1397,minor_faults=0,major_faults=0,involuntary_switches=249
+Events disabled
+Events enabled
+Events disabled
+cpu=0,completed=2688,busy_pct=98.693,involuntary_switches=25
+cpu=18,completed=2640,busy_pct=98.227,involuntary_switches=4
+cpu=1,completed=2704,busy_pct=98.772,involuntary_switches=6
+cpu=19,completed=2608,busy_pct=98.463,involuntary_switches=14
+cpu=2,completed=2672,busy_pct=98.585,involuntary_switches=8
+cpu=20,completed=2608,busy_pct=98.254,involuntary_switches=7
+cpu=3,completed=2688,busy_pct=98.663,involuntary_switches=5
+cpu=21,completed=2656,busy_pct=98.725,involuntary_switches=4
+cpu=4,completed=2720,busy_pct=98.808,involuntary_switches=5
+cpu=22,completed=2624,busy_pct=98.758,involuntary_switches=7
+cpu=5,completed=2688,busy_pct=99.037,involuntary_switches=4
+cpu=23,completed=2608,busy_pct=98.240,involuntary_switches=19
+cpu=6,completed=2608,busy_pct=98.725,involuntary_switches=9
+cpu=24,completed=2656,busy_pct=98.834,involuntary_switches=4
+cpu=7,completed=2720,busy_pct=98.592,involuntary_switches=5
+cpu=25,completed=2432,busy_pct=98.830,involuntary_switches=8
+cpu=8,completed=2656,busy_pct=98.364,involuntary_switches=5
+cpu=26,completed=2640,busy_pct=98.537,involuntary_switches=5
+cpu=9,completed=2640,busy_pct=98.815,involuntary_switches=6
+cpu=27,completed=2608,busy_pct=98.570,involuntary_switches=5
+cpu=10,completed=2736,busy_pct=98.492,involuntary_switches=6
+cpu=28,completed=2448,busy_pct=98.505,involuntary_switches=5
+cpu=11,completed=2672,busy_pct=98.732,involuntary_switches=6
+cpu=29,completed=2640,busy_pct=98.538,involuntary_switches=6
+cpu=12,completed=2640,busy_pct=98.557,involuntary_switches=5
+cpu=30,completed=2624,busy_pct=98.708,involuntary_switches=11
+cpu=13,completed=2640,busy_pct=98.600,involuntary_switches=5
+cpu=31,completed=2448,busy_pct=98.462,involuntary_switches=6
+cpu=14,completed=2592,busy_pct=98.582,involuntary_switches=5
+cpu=32,completed=2640,busy_pct=98.594,involuntary_switches=6
+cpu=15,completed=2656,busy_pct=98.702,involuntary_switches=5
+cpu=33,completed=2624,busy_pct=98.500,involuntary_switches=6
+cpu=16,completed=2640,busy_pct=98.429,involuntary_switches=5
+cpu=34,completed=2368,busy_pct=98.903,involuntary_switches=5
+cpu=17,completed=2624,busy_pct=98.697,involuntary_switches=5
+cpu=35,completed=2416,busy_pct=99.087,involuntary_switches=7
+[ perf record: Woken up 19 times to write data ]
+[ perf record: Captured and wrote 0.434 MB /tmp/hnsw-pebs-gfbx4ply/perf.data (6319 samples) ]

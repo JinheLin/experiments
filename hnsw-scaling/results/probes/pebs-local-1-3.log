@@ -1,0 +1,8 @@
+rows=524288,maps=1,slots_per_index=1,mapped_pages_n0=412224,mapped_pages_n1=0,kernel=skylake
+seconds=2.501079,completed=3472,errors=0,short=0,qps=1388.201,cpu_cores=0.9950,host_idle_pct=93.701,cpu_us_per_query=716.7736,p50_us=746.683,p95_us=1054.298,p99_us=1438.221,samples=52,minor_faults=133,major_faults=0,involuntary_switches=24
+Events disabled
+Events enabled
+Events disabled
+cpu=0,completed=3472,busy_pct=99.503,involuntary_switches=24
+[ perf record: Woken up 4 times to write data ]
+[ perf record: Captured and wrote 0.048 MB /tmp/hnsw-pebs-ozfkqqer/perf.data (242 samples) ]

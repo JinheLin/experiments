@@ -1,0 +1,5 @@
+   Compiling usearch v2.25.3 (/DATA/disk1/jinhelin/hnsw-scaling-20261105/diagnostic/usearch)
+   Compiling hnsw-scaling-diagnostic v0.1.0 (/DATA/disk1/jinhelin/hnsw-scaling-20261105/diagnostic)
+    Finished `release` profile [optimized] target(s) in 11.38s
+   Compiling hnsw-scaling-diagnostic v0.1.0 (/DATA/disk1/jinhelin/hnsw-scaling-20261105/diagnostic)
+    Finished `release` profile [optimized] target(s) in 1.00s
