@@ -239,6 +239,47 @@ def query_reuse(path, out):
     plt.close(fig)
 
 
+def story(path, out):
+    with path.open() as file:
+        rows = list(csv.DictReader(file))
+    unbound = series(rows, placement="unbound")
+    local = series(rows, placement="local")
+    fig, axes = plt.subplots(1, 3, figsize=(11.8, 3.4), layout="constrained")
+    for ax, metric, title, unit, divisor in zip(
+        axes, ("qps", "cpu_cores", "ipc"),
+        ("Throughput", "Worker CPU time", "Instructions per cycle"),
+        ("kQPS", "Logical CPUs of worker time", "IPC"), (1000, 1, 1),
+    ):
+        for data, color, label in ((unbound, BLUE, "Unbound"), (local, GREEN, "One socket, local pages")):
+            curve(ax, data, metric, label, color, divisor, errors=metric == "qps")
+        axis(ax, title, unit, (18, 24, 36, 48, 54, 72))
+        ax.set(xlabel="Query workers", ylim=(0, None))
+    axes[0].legend(frameon=False, fontsize=8)
+    fig.savefig(out / "story-scaling.svg")
+    plt.close(fig)
+
+    control = [series(rows, placement=place, threads=18)[0] for place in ("local", "local-smt")]
+    fig, axes = plt.subplots(1, 2, figsize=(8.2, 3.4), layout="constrained")
+    for ax, metric, title, unit, divisor in zip(
+        axes, ("qps", "cpu_us_per_query"), ("Same 18 workers", "CPU cost per query"),
+        ("kQPS", "Worker CPU time (µs)"), (1000, 1),
+    ):
+        center = values(control, metric, divisor)
+        errors = None
+        if metric == "qps":
+            low = values(control, "qps_min", divisor)
+            high = values(control, "qps_max", divisor)
+            errors = [[mid - lo for mid, lo in zip(center, low)],
+                      [hi - mid for mid, hi in zip(center, high)]]
+        bars = ax.bar((0, 1), center, color=(GREEN, ORANGE), width=.58, yerr=errors, capsize=4)
+        ax.bar_label(bars, fmt="%.1f", padding=4)
+        axis(ax, title, unit, (0, 1))
+        ax.set(xlabel="", xticklabels=("18 cores × 1 thread", "9 cores × 2 threads"),
+               ylim=(0, max(values(control, metric, divisor)) * 1.2))
+    fig.savefig(out / "story-smt.svg")
+    plt.close(fig)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("summary", type=Path)
@@ -246,6 +287,7 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--numa-pairs", type=Path, help="render only the longer paired NUMA comparison")
     mode.add_argument("--query-reuse", type=Path, help="render only the query-bank and order controls")
+    mode.add_argument("--story", type=Path, help="render the unbound and single-socket investigation")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({"svg.fonttype": "none", "font.size": 9, "axes.titleweight": "bold"})
@@ -254,6 +296,9 @@ def main():
         return
     if args.query_reuse:
         query_reuse(args.query_reuse, args.output)
+        return
+    if args.story:
+        story(args.story, args.output)
         return
     with args.summary.open() as file:
         rows = list(csv.DictReader(file))

@@ -1,0 +1,44 @@
+rows=524288,maps=1,slots_per_index=36,mapped_pages_n0=412224,mapped_pages_n1=0,query_count=1000,query_copies=1,kernel=skylake
+seconds=5.013798,completed=166944,errors=0,short=0,qps=33296.917,cpu_cores=35.6906,host_idle_pct=45.214,cpu_us_per_query=1071.8896,p50_us=1021.006,p95_us=1671.884,p99_us=2044.736,samples=2500,minor_faults=6094,major_faults=0,involuntary_switches=417,voluntary_switches=8966,latency_stride=67,host_busy_n0=19.606,host_busy_n1=19.775,host_busy_query_cpus=39.381,disk_read_bytes=0
+Events disabled
+Events enabled
+Events disabled
+cpu=-1,completed=4880,busy_pct=99.175,involuntary_switches=14,sampled_node0=51,sampled_node1=22
+cpu=-1,completed=5328,busy_pct=99.165,involuntary_switches=7,sampled_node0=77,sampled_node1=3
+cpu=-1,completed=4688,busy_pct=99.157,involuntary_switches=13,sampled_node0=44,sampled_node1=26
+cpu=-1,completed=3760,busy_pct=99.142,involuntary_switches=14,sampled_node0=4,sampled_node1=53
+cpu=-1,completed=5568,busy_pct=99.252,involuntary_switches=7,sampled_node0=84,sampled_node1=0
+cpu=-1,completed=3728,busy_pct=99.244,involuntary_switches=11,sampled_node0=0,sampled_node1=56
+cpu=-1,completed=3728,busy_pct=99.324,involuntary_switches=10,sampled_node0=0,sampled_node1=56
+cpu=-1,completed=3888,busy_pct=99.098,involuntary_switches=10,sampled_node0=3,sampled_node1=55
+cpu=-1,completed=3696,busy_pct=99.257,involuntary_switches=16,sampled_node0=0,sampled_node1=56
+cpu=-1,completed=3776,busy_pct=99.251,involuntary_switches=14,sampled_node0=0,sampled_node1=57
+cpu=-1,completed=4560,busy_pct=99.224,involuntary_switches=10,sampled_node0=36,sampled_node1=32
+cpu=-1,completed=4640,busy_pct=98.955,involuntary_switches=13,sampled_node0=35,sampled_node1=35
+cpu=-1,completed=5008,busy_pct=99.210,involuntary_switches=11,sampled_node0=64,sampled_node1=11
+cpu=-1,completed=5216,busy_pct=99.110,involuntary_switches=9,sampled_node0=76,sampled_node1=2
+cpu=-1,completed=5696,busy_pct=98.938,involuntary_switches=7,sampled_node0=85,sampled_node1=0
+cpu=-1,completed=5536,busy_pct=99.135,involuntary_switches=5,sampled_node0=83,sampled_node1=0
+cpu=-1,completed=5712,busy_pct=99.122,involuntary_switches=7,sampled_node0=86,sampled_node1=0
+cpu=-1,completed=3744,busy_pct=99.333,involuntary_switches=8,sampled_node0=0,sampled_node1=56
+cpu=-1,completed=5344,busy_pct=99.139,involuntary_switches=9,sampled_node0=78,sampled_node1=2
+cpu=-1,completed=3872,busy_pct=99.251,involuntary_switches=16,sampled_node0=0,sampled_node1=58
+cpu=-1,completed=5712,busy_pct=99.009,involuntary_switches=11,sampled_node0=85,sampled_node1=0
+cpu=-1,completed=5360,busy_pct=98.983,involuntary_switches=6,sampled_node0=80,sampled_node1=0
+cpu=-1,completed=3856,busy_pct=98.959,involuntary_switches=16,sampled_node0=0,sampled_node1=58
+cpu=-1,completed=4560,busy_pct=99.012,involuntary_switches=17,sampled_node0=40,sampled_node1=28
+cpu=-1,completed=3824,busy_pct=99.181,involuntary_switches=14,sampled_node0=0,sampled_node1=57
+cpu=-1,completed=5632,busy_pct=99.119,involuntary_switches=10,sampled_node0=84,sampled_node1=0
+cpu=-1,completed=5712,busy_pct=99.081,involuntary_switches=7,sampled_node0=85,sampled_node1=0
+cpu=-1,completed=3840,busy_pct=99.258,involuntary_switches=12,sampled_node0=0,sampled_node1=57
+cpu=-1,completed=4848,busy_pct=99.229,involuntary_switches=16,sampled_node0=61,sampled_node1=11
+cpu=-1,completed=3648,busy_pct=99.296,involuntary_switches=11,sampled_node0=4,sampled_node1=51
+cpu=-1,completed=5392,busy_pct=98.930,involuntary_switches=9,sampled_node0=81,sampled_node1=0
+cpu=-1,completed=3856,busy_pct=98.999,involuntary_switches=20,sampled_node0=0,sampled_node1=58
+cpu=-1,completed=5712,busy_pct=99.147,involuntary_switches=5,sampled_node0=85,sampled_node1=0
+cpu=-1,completed=3600,busy_pct=99.058,involuntary_switches=28,sampled_node0=2,sampled_node1=52
+cpu=-1,completed=5408,busy_pct=99.113,involuntary_switches=7,sampled_node0=81,sampled_node1=0
+cpu=-1,completed=3616,busy_pct=99.205,involuntary_switches=17,sampled_node0=0,sampled_node1=54
+post_view_pages=412224,0
+[ perf record: Woken up 4 times to write data ]
+[ perf record: Captured and wrote 0.724 MB /tmp/hnsw-pebs-yb7hry4w/perf.data (11167 samples) ]

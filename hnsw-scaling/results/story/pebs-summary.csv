@@ -1,0 +1,81 @@
+label,rep,source,samples,p50_cycles,p95_cycles
+local-18,1,L1 hit,418,93.0,678
+local-18,1,L2 hit,198,35.0,47
+local-18,1,L3 hit,661,136,566
+local-18,1,LFB/MAB hit,5832,165.0,656
+local-18,1,RAM hit,299,217,535
+local-18,2,L1 hit,423,112,622
+local-18,2,L2 hit,199,35,56
+local-18,2,L3 hit,579,155,552
+local-18,2,L3 miss,2,34.5,36
+local-18,2,LFB/MAB hit,6322,170.0,623
+local-18,2,RAM hit,387,218,655
+local-18,3,L1 hit,365,97,680
+local-18,3,L2 hit,228,36.0,47
+local-18,3,L3 hit,628,114.0,532
+local-18,3,L3 miss,1,38,38
+local-18,3,LFB/MAB hit,5286,166.0,718
+local-18,3,RAM hit,260,216.5,637
+local-36,1,L1 hit,334,66.0,799
+local-36,1,L2 hit,177,37,135
+local-36,1,L3 hit,384,178.5,779
+local-36,1,LFB/MAB hit,6128,180.0,826
+local-36,1,RAM hit,206,319.0,849
+local-36,2,L1 hit,354,75.0,710
+local-36,2,L2 hit,188,37.0,94
+local-36,2,L3 hit,448,194.0,956
+local-36,2,LFB/MAB hit,6247,183,764
+local-36,2,RAM hit,224,307.5,869
+local-36,3,L1 hit,306,79.0,1171
+local-36,3,L2 hit,165,37,101
+local-36,3,L3 hit,426,192.5,985
+local-36,3,LFB/MAB hit,5637,178,957
+local-36,3,RAM hit,180,331.0,997
+unbound-36,1,L1 hit,591,142,922
+unbound-36,1,L2 hit,270,36.0,76
+unbound-36,1,L3 hit,859,189,768
+unbound-36,1,L3 miss,7,265,320
+unbound-36,1,LFB/MAB hit,9149,228,868
+unbound-36,1,RAM hit,241,219,667
+unbound-36,1,Remote Any cache hit,9,271,414
+unbound-36,1,Remote RAM hit,272,439.0,949
+unbound-36,2,L1 hit,561,168,951
+unbound-36,2,L2 hit,247,36,109
+unbound-36,2,L3 hit,689,191,823
+unbound-36,2,L3 miss,9,221,570
+unbound-36,2,LFB/MAB hit,8990,242.0,921
+unbound-36,2,RAM hit,375,227,726
+unbound-36,2,Remote Any cache hit,17,312,654
+unbound-36,2,Remote RAM hit,279,491,1107
+unbound-36,3,L1 hit,593,156,964
+unbound-36,3,L2 hit,297,36,96
+unbound-36,3,L3 hit,913,169,711
+unbound-36,3,L3 miss,17,275,569
+unbound-36,3,LFB/MAB hit,9452,226.5,899
+unbound-36,3,RAM hit,268,222.0,706
+unbound-36,3,Remote Any cache hit,9,262,857
+unbound-36,3,Remote RAM hit,263,445,1034
+unbound-54,1,L1 hit,631,94,966
+unbound-54,1,L2 hit,316,37.0,74
+unbound-54,1,L3 hit,833,167,846
+unbound-54,1,L3 miss,9,301,856
+unbound-54,1,LFB/MAB hit,10410,184.0,839
+unbound-54,1,RAM hit,209,253,730
+unbound-54,1,Remote Any cache hit,9,307,1218
+unbound-54,1,Remote RAM hit,160,444.5,1080
+unbound-54,2,L1 hit,651,78,859
+unbound-54,2,L2 hit,336,36.0,83
+unbound-54,2,L3 hit,915,163,782
+unbound-54,2,L3 miss,11,269,913
+unbound-54,2,LFB/MAB hit,10756,178.0,827
+unbound-54,2,RAM hit,234,231.0,774
+unbound-54,2,Remote Any cache hit,9,293,574
+unbound-54,2,Remote RAM hit,177,372,962
+unbound-54,3,L1 hit,676,76.0,798
+unbound-54,3,L2 hit,334,36.0,130
+unbound-54,3,L3 hit,861,149,711
+unbound-54,3,L3 miss,13,260,684
+unbound-54,3,LFB/MAB hit,10828,170.0,775
+unbound-54,3,RAM hit,246,240.0,1013
+unbound-54,3,Remote Any cache hit,20,267.0,482
+unbound-54,3,Remote RAM hit,138,437.5,1051

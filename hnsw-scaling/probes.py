@@ -33,7 +33,7 @@ def bandwidth(stream, out):
                 ], stdout=log)
 
 
-def latency(binary, data, out, replica=False):
+def latency(binary, data, out, replica=False, story=False):
     cases = (
         ("local-1", LOCAL[:1], "--membind=0", ""),
         ("local-18", LOCAL[:18], "--membind=0", ""),
@@ -43,6 +43,13 @@ def latency(binary, data, out, replica=False):
     )
     if replica:
         cases = tuple((f"replica-{workers}", SPREAD[:workers], "--localalloc", "") for workers in (54, 72))
+    if story:
+        cases = (
+            ("unbound-36", list(range(36)), "", ""),
+            ("unbound-54", list(range(54)), "", ""),
+            ("local-18", LOCAL[:18], "--membind=0", ""),
+            ("local-36", LOCAL[:36], "--membind=0", ""),
+        )
     for label, cpus, placement, suffix in cases:
         for rep in range(1, 4):
             with tempfile.TemporaryDirectory(prefix="hnsw-pebs-") as temp:
@@ -51,13 +58,20 @@ def latency(binary, data, out, replica=False):
                 raw = folder / "perf.data"
                 os.mkfifo(ctl)
                 os.mkfifo(ack)
+                unbound = label.startswith("unbound-")
+                workload = [
+                    str(binary.resolve()), "bench", str(data / f"laion-524288{suffix}.usearch"),
+                    str(data / "queries.f32"), "pair" if replica else "shared", "64",
+                    f"unbound:{len(cpus)}" if unbound else ",".join(map(str, cpus)),
+                    "5" if story else "2.5", "2" if story else "0.6",
+                ]
+                if not unbound:
+                    workload = ["numactl", f"--physcpubind={cpus[0]}", placement, *workload]
                 command = [
                     "env", f"HNSW_PERF_FIFOS={ctl},{ack}",
                     "perf", "mem", "record", "-t", "load", "-U", "--ldlat", "30",
                     "-c", "10007", "--delay=-1", f"--control=fifo:{ctl},{ack}", "-o", str(raw), "--",
-                    "numactl", f"--physcpubind={cpus[0]}", placement, str(binary.resolve()), "bench",
-                    str(data / f"laion-524288{suffix}.usearch"), str(data / "queries.f32"),
-                    "pair" if replica else "shared", "64", ",".join(map(str, cpus)), "2.5", "0.6",
+                    *workload,
                 ]
                 if replica:
                     command.append(str(data / "laion-524288-node1.usearch"))
@@ -78,12 +92,13 @@ def main():
     parser.add_argument("--data", type=Path, default=Path("data"))
     parser.add_argument("--binary", type=Path, default=Path("target/release/hnsw-scaling"))
     parser.add_argument("--stream", type=Path, default=Path("target/stream-read"))
-    parser.add_argument("--only", choices=("bandwidth", "latency", "replica-latency"))
+    parser.add_argument("--only", choices=("bandwidth", "latency", "replica-latency", "story-latency"))
     args = parser.parse_args()
     if args.only in (None, "bandwidth"):
         bandwidth(args.stream, args.output)
-    if args.only in (None, "latency", "replica-latency"):
-        latency(args.binary, args.data, args.output, replica=args.only == "replica-latency")
+    if args.only in (None, "latency", "replica-latency", "story-latency"):
+        latency(args.binary, args.data, args.output, replica=args.only == "replica-latency",
+                story=args.only == "story-latency")
 
 
 if __name__ == "__main__":

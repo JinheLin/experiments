@@ -22,7 +22,7 @@ EVENTS = {
 }
 
 
-def derived(record):
+def derived(record, *, allow_major_faults=False):
     stats = {}
     for line in record["core_perf"].splitlines():
         if line and not line.startswith("#"):
@@ -30,7 +30,8 @@ def derived(record):
             stats[event] = float(value), float(running)
     seconds = float(record["seconds"])
     completed = int(record["completed"])
-    assert int(record["errors"]) == int(record["short"]) == int(record["major_faults"]) == 0
+    assert int(record["errors"]) == int(record["short"]) == 0
+    assert allow_major_faults or int(record["major_faults"]) == 0
     assert sum(int(worker["completed"]) for worker in record["workers"]) == completed
     assert len(record["workers"]) == record["threads"]
     row = {name: float(record[name]) for name in BASIC}
@@ -151,13 +152,18 @@ def latency(results):
 
 
 def review_metrics(record):
-    row = derived(record)
+    row = derived(record, allow_major_faults="disk_read_bytes" in record)
+    if "disk_read_bytes" in record:
+        row["disk_read_bytes"] = int(record["disk_read_bytes"])
+        row["major_faults"] = int(record["major_faults"])
     seconds = float(record["seconds"])
     row["involuntary_per_second"] = int(record["involuntary_switches"]) / seconds
     row["voluntary_per_second"] = int(record["voluntary_switches"]) / seconds
     if "host_busy_query_cpus" in record:
         row["non_worker_cores_on_query_cpus"] = float(record["host_busy_query_cpus"]) - row["cpu_cores"]
     for node in range(2):
+        if record["placement"] == "unbound":
+            continue
         workers = sum(
             float(worker["busy_pct"]) / 100 for worker in record["workers"]
             if int(worker["cpu"]) in (LOCAL, REMOTE)[node]
@@ -169,6 +175,13 @@ def review_metrics(record):
             cycles = row["cycles_per_query"] * int(record["completed"])
             row["estimated_worker_ghz"] = 2.6 * cycles / float(count)
             row["core_pmu_running_pct"] = min(row["core_pmu_running_pct"], float(running))
+        elif ",,cpu-migrations," in line:
+            row["migrations_per_second"] = float(line.split(",")[0]) / seconds
+    if "sampled_node0" in record["workers"][0]:
+        n0 = sum(int(worker["sampled_node0"]) for worker in record["workers"])
+        n1 = sum(int(worker["sampled_node1"]) for worker in record["workers"])
+        assert n0 + n1 == int(record["samples"])
+        row["sampled_queries_node1_pct"] = 100 * n1 / (n0 + n1)
     return row
 
 
@@ -228,6 +241,7 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--review-only", action="store_true")
     mode.add_argument("--followup-only", action="store_true")
+    mode.add_argument("--story-only", action="store_true")
     args = parser.parse_args()
     if args.review_only:
         review(args.results)
@@ -235,11 +249,17 @@ def main():
     if args.followup_only:
         review(args.results, "followup", "variant")
         return
+    if args.story_only:
+        review(args.results, "story", "variant")
+        latency(args.results / "story")
+        return
     benchmark(args.results)
     bandwidth(args.results)
     latency(args.results)
     review(args.results)
     review(args.results, "followup", "variant")
+    review(args.results, "story", "variant")
+    latency(args.results / "story")
 
 
 if __name__ == "__main__":

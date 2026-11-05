@@ -1,6 +1,6 @@
 # USearch HNSW read-only scaling
 
-[实验文章（中文）](ARTICLE.md) · [逐轮结果](results/) · [每组中位数](results/summary.csv)
+[技术博客（中文）](BLOG.md) · [文章副本](ARTICLE.md) · [逐轮结果](results/) · [每组中位数](results/summary.csv)
 
 ## Environment
 
@@ -192,3 +192,48 @@ pairs a full pass with four consecutive copies of each individual query at
 for a complete pass. Timed runs use three 8-second windows per cell, sample one
 call in four, and retain the observed minimum and maximum in the summary.
 The plotted 2 ms line is an example budget for the closed-loop P99.
+
+## Reproduce the unbound-to-single-socket investigation
+
+The blog starts with an unbound workload and follows the perf evidence toward
+NUMA and SMT controls. These runs use the existing 524,288-vector graph and the
+original 1,000 test queries, with one shared Index throughout the new sweep.
+The unbound entry point calls no affinity or memory-policy setter. Workers
+inherit the host's full CPU mask. The file pages were already resident on node
+0 from index preparation, and their placement is verified before and after
+every window. The local entry point binds workers and new allocations to node
+0. The same shared index file remains mapped in both cases.
+
+```bash
+bash build.sh --offline
+mkdir -p results/story/probes
+python3 run.py story results/story/scaling.jsonl \
+  --repeat 3 --seconds 12 --warmup 2 --telemetry --imc --latency-stride 4
+python3 probes.py results/story/probes --only story-latency
+gzip -n results/story/probes/*.txt
+python3 summarize.py results --story-only
+uv run --no-project --with matplotlib==3.11.2 python plot.py \
+  results/summary.csv figures --story results/story/summary.csv
+```
+
+The first pass sweeps unbound counts 18, 24, 36, 48, 54 and 72, then pinned
+counts 18, 24 and 36 on node 0, then 18 workers on nine node-0 cores using both
+SMT siblings. The second pass reverses this order, and the third repeats the
+first. All throughput windows run for 12 seconds after two seconds of warmup.
+PEBS runs separately in three five-second windows for unbound 36/54 and local
+18/36, using the same 30-cycle qualifying-load threshold as the earlier probes.
+
+The runner uses root perf permission for kernel scheduling events, then drops
+back to the invoking user before launching the workload. Hardware events retain
+their user-space modifiers. The raw core output includes CPU migrations and
+context switches. After each sampled search, the worker also records its
+current NUMA node. These counts describe sampled completions rather than exact
+per-socket execution time. Unbound worker records use `cpu=-1`, and their
+`cpus` list is empty. Pinned records retain their actual logical CPU numbers.
+
+The process records `/proc/self/io` storage-read bytes across the timed work.
+Major faults are retained in these raw results and the summary even when the
+storage-read counter stays at zero. The summary computes IPC and retired
+local/remote DRAM loads per completed query, alongside host-wide IMC and UPI
+traffic. The ordinary suites keep their existing zero-major-fault validation.
+The blog's two Markdown entry points contain the same narrative.

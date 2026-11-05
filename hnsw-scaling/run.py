@@ -42,6 +42,14 @@ def matrix(suite):
     elif suite == "replica-long":
         for threads in (54, 72):
             yield SIZES[-1], "pair", 64, "spread", "replica", threads
+    elif suite == "story":
+        for placement, counts in (
+            ("unbound", (18, 24, 36, 48, 54, 72)),
+            ("local", (18, 24, 36)),
+            ("local-smt", (18,)),
+        ):
+            for threads in counts:
+                yield SIZES[-1], "shared", 64, placement, "node0", threads
     elif suite == "replicas":
         for pages, threads in itertools.product(("interleave", "replica"), (18, 36, 54, 64, 72)):
             yield SIZES[-1], "pair", 64, "spread", pages, threads
@@ -85,19 +93,22 @@ def fields(line):
 
 def run_cell(case, rep, args, *, cpus=None, query_block=None):
     rows, mode, ef, placement, pages, threads = case
+    unbound = placement == "unbound"
     if cpus is None:
-        cpus = {"local": LOCAL, "local-smt": LOCAL_SMT, "remote": REMOTE, "spread": SPREAD}[placement][:threads]
-    assert len(cpus) == len(set(cpus)) == threads
+        cpus = [] if unbound else {"local": LOCAL, "local-smt": LOCAL_SMT, "remote": REMOTE, "spread": SPREAD}[placement][:threads]
+    assert unbound or len(cpus) == len(set(cpus)) == threads
     index = args.data / f"laion-{rows}{'-interleave' if pages == 'interleave' else ''}.usearch"
-    policy = {
-        "local": "--membind=0", "local-smt": "--membind=0",
-        "remote": "--membind=1", "spread": "--localalloc"
-    }[placement]
     cmd = [
-        "numactl", f"--physcpubind={cpus[0]}", policy, str(args.binary.resolve()),
+        str(args.binary.resolve()),
         "bench", str(index), str(args.queries or args.data / "queries.f32"), mode, str(ef),
-        ",".join(map(str, cpus)), str(args.seconds), str(args.warmup),
+        f"unbound:{threads}" if unbound else ",".join(map(str, cpus)), str(args.seconds), str(args.warmup),
     ]
+    if not unbound:
+        policy = {
+            "local": "--membind=0", "local-smt": "--membind=0",
+            "remote": "--membind=1", "spread": "--localalloc"
+        }[placement]
+        cmd = ["numactl", f"--physcpubind={cpus[0]}", policy, *cmd]
     if mode == "pair":
         second = args.data / f"laion-{rows}-node1.usearch" if pages == "replica" else index
         cmd.append(str(second))
@@ -109,22 +120,32 @@ def run_cell(case, rep, args, *, cpus=None, query_block=None):
         core_stat = directory / "core.csv"
         ctl = f"{core_ctl},{core_ack}"
         events = f"{EVENTS},ref-cycles:u" if args.telemetry else EVENTS
-        cmd = [
-            "env", f"HNSW_PERF_FIFOS={ctl}", f"HNSW_LATENCY_STRIDE={args.latency_stride}", "perf", "stat", "-x,", "--delay=-1",
-            f"--control=fifo:{ctl}", "-o", str(core_stat), "-e", events, "--", *cmd,
-        ]
+        if args.suite == "story":
+            events += ",cpu-migrations,context-switches"
+        environment = ["env", f"HNSW_PERF_FIFOS={ctl}", f"HNSW_LATENCY_STRIDE={args.latency_stride}"]
         if query_block is not None:
-            cmd.insert(2, f"HNSW_QUERY_BLOCK={query_block}")
+            environment.append(f"HNSW_QUERY_BLOCK={query_block}")
+        imc_pair = None
         if args.imc:
             imc_ctl, imc_ack = directory / "imc-ctl", directory / "imc-ack"
             os.mkfifo(imc_ctl)
             os.mkfifo(imc_ack)
             imc_stat = directory / "imc.csv"
             imc_pair = f"{imc_ctl},{imc_ack}"
-            cmd[1] += f" {imc_pair}"
+            environment[1] += f" {imc_pair}"
+        cmd = [
+            "perf", "stat", "-x,", "--delay=-1", f"--control=fifo:{ctl}",
+            "-o", str(core_stat), "-e", events, "--", *environment, *cmd,
+        ]
+        if args.suite == "story":
+            # Software scheduling events need kernel permission on this host.
+            split = cmd.index("--")
+            cmd = ["sudo", "-n", *cmd[:split + 1],
+                   "sudo", "-n", "-u", os.environ["USER"], "--", *cmd[split + 1:]]
+        if imc_pair is not None:
             cmd = [
                 "sudo", "-n", "perf", "stat", "-a", "-A", "-x,", "--delay=-1",
-                f"--control=fifo:{imc_pair}", "-o", str(imc_stat), "-e", f"{IMC},{UPI}" if args.suite in ("replicas", "numa-long", "replica-long") else IMC, "--",
+                f"--control=fifo:{imc_pair}", "-o", str(imc_stat), "-e", f"{IMC},{UPI}" if args.suite in ("replicas", "numa-long", "replica-long", "story") else IMC, "--",
                 "sudo", "-n", "-u", os.environ["USER"], "--", *cmd,
             ]
         result = subprocess.run(cmd, check=False, text=True, capture_output=True, timeout=max(120, args.seconds + args.warmup + 60))
@@ -167,7 +188,7 @@ def run_cell(case, rep, args, *, cpus=None, query_block=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("suite", choices=("primary", "topology", "short", "slots", "smt", "replicas", "numa-long", "replica-long", "slot-audit"))
+    parser.add_argument("suite", choices=("primary", "topology", "short", "slots", "smt", "replicas", "numa-long", "replica-long", "slot-audit", "story"))
     parser.add_argument("output", type=Path)
     parser.add_argument("--data", type=Path, default=Path("data"))
     parser.add_argument("--binary", type=Path, default=Path("target/release/hnsw-scaling"))
@@ -184,6 +205,8 @@ def main():
     with args.output.open("x", buffering=1) as out:
         for rep in range(1, args.repeat + 1):
             if args.suite.endswith("-long"):
+                ordered = cases if rep % 2 else reversed(cases)
+            elif args.suite == "story":
                 ordered = cases if rep % 2 else reversed(cases)
             else:
                 random.Random(85969 + rep).shuffle(cases)

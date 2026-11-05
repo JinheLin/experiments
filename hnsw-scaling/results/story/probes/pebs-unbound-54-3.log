@@ -1,0 +1,62 @@
+rows=524288,maps=1,slots_per_index=54,mapped_pages_n0=412224,mapped_pages_n1=0,query_count=1000,query_copies=1,kernel=skylake
+seconds=5.015543,completed=248512,errors=0,short=0,qps=49548.370,cpu_cores=53.2004,host_idle_pct=21.199,cpu_us_per_query=1073.7054,p50_us=1033.532,p95_us=1695.007,p99_us=2164.044,samples=3715,minor_faults=6925,major_faults=0,involuntary_switches=633,voluntary_switches=141522,latency_stride=67,host_busy_n0=28.210,host_busy_n1=28.316,host_busy_query_cpus=56.526,disk_read_bytes=0
+Events disabled
+Events enabled
+Events disabled
+cpu=-1,completed=4224,busy_pct=98.474,involuntary_switches=14,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=4288,busy_pct=98.589,involuntary_switches=11,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=4512,busy_pct=98.701,involuntary_switches=12,sampled_node0=0,sampled_node1=68
+cpu=-1,completed=4464,busy_pct=98.504,involuntary_switches=13,sampled_node0=31,sampled_node1=36
+cpu=-1,completed=4288,busy_pct=98.452,involuntary_switches=15,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=4512,busy_pct=98.590,involuntary_switches=11,sampled_node0=0,sampled_node1=68
+cpu=-1,completed=4464,busy_pct=98.582,involuntary_switches=11,sampled_node0=0,sampled_node1=67
+cpu=-1,completed=5152,busy_pct=98.676,involuntary_switches=9,sampled_node0=77,sampled_node1=0
+cpu=-1,completed=4496,busy_pct=98.378,involuntary_switches=16,sampled_node0=0,sampled_node1=67
+cpu=-1,completed=4960,busy_pct=98.656,involuntary_switches=6,sampled_node0=74,sampled_node1=0
+cpu=-1,completed=4288,busy_pct=98.464,involuntary_switches=16,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=5072,busy_pct=98.438,involuntary_switches=8,sampled_node0=76,sampled_node1=0
+cpu=-1,completed=4784,busy_pct=98.358,involuntary_switches=11,sampled_node0=72,sampled_node1=0
+cpu=-1,completed=4864,busy_pct=98.430,involuntary_switches=6,sampled_node0=73,sampled_node1=0
+cpu=-1,completed=4544,busy_pct=98.930,involuntary_switches=17,sampled_node0=68,sampled_node1=0
+cpu=-1,completed=4464,busy_pct=98.529,involuntary_switches=11,sampled_node0=0,sampled_node1=67
+cpu=-1,completed=4816,busy_pct=98.242,involuntary_switches=8,sampled_node0=72,sampled_node1=0
+cpu=-1,completed=5168,busy_pct=98.704,involuntary_switches=5,sampled_node0=77,sampled_node1=0
+cpu=-1,completed=4832,busy_pct=98.605,involuntary_switches=6,sampled_node0=72,sampled_node1=0
+cpu=-1,completed=4528,busy_pct=98.361,involuntary_switches=9,sampled_node0=68,sampled_node1=0
+cpu=-1,completed=3968,busy_pct=98.724,involuntary_switches=11,sampled_node0=0,sampled_node1=59
+cpu=-1,completed=4464,busy_pct=98.551,involuntary_switches=10,sampled_node0=0,sampled_node1=67
+cpu=-1,completed=4288,busy_pct=98.575,involuntary_switches=14,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=4528,busy_pct=98.313,involuntary_switches=12,sampled_node0=33,sampled_node1=35
+cpu=-1,completed=4464,busy_pct=98.350,involuntary_switches=41,sampled_node0=0,sampled_node1=67
+cpu=-1,completed=4704,busy_pct=98.635,involuntary_switches=6,sampled_node0=70,sampled_node1=0
+cpu=-1,completed=5136,busy_pct=98.317,involuntary_switches=8,sampled_node0=76,sampled_node1=1
+cpu=-1,completed=5072,busy_pct=98.474,involuntary_switches=9,sampled_node0=76,sampled_node1=0
+cpu=-1,completed=4816,busy_pct=98.200,involuntary_switches=11,sampled_node0=72,sampled_node1=0
+cpu=-1,completed=5136,busy_pct=98.451,involuntary_switches=7,sampled_node0=77,sampled_node1=0
+cpu=-1,completed=4304,busy_pct=98.518,involuntary_switches=12,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=4272,busy_pct=98.302,involuntary_switches=11,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=5136,busy_pct=98.318,involuntary_switches=7,sampled_node0=77,sampled_node1=0
+cpu=-1,completed=4288,busy_pct=98.768,involuntary_switches=14,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=4832,busy_pct=98.878,involuntary_switches=9,sampled_node0=72,sampled_node1=0
+cpu=-1,completed=4544,busy_pct=98.813,involuntary_switches=12,sampled_node0=68,sampled_node1=0
+cpu=-1,completed=5072,busy_pct=98.545,involuntary_switches=6,sampled_node0=76,sampled_node1=0
+cpu=-1,completed=4272,busy_pct=98.202,involuntary_switches=11,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=3968,busy_pct=98.725,involuntary_switches=11,sampled_node0=0,sampled_node1=59
+cpu=-1,completed=4368,busy_pct=98.602,involuntary_switches=12,sampled_node0=2,sampled_node1=63
+cpu=-1,completed=4336,busy_pct=98.470,involuntary_switches=23,sampled_node0=0,sampled_node1=65
+cpu=-1,completed=4080,busy_pct=98.459,involuntary_switches=21,sampled_node0=0,sampled_node1=61
+cpu=-1,completed=4608,busy_pct=98.743,involuntary_switches=12,sampled_node0=60,sampled_node1=9
+cpu=-1,completed=4816,busy_pct=98.401,involuntary_switches=7,sampled_node0=72,sampled_node1=0
+cpu=-1,completed=4080,busy_pct=98.563,involuntary_switches=12,sampled_node0=0,sampled_node1=61
+cpu=-1,completed=4944,busy_pct=98.518,involuntary_switches=6,sampled_node0=74,sampled_node1=0
+cpu=-1,completed=4784,busy_pct=98.526,involuntary_switches=6,sampled_node0=71,sampled_node1=0
+cpu=-1,completed=4144,busy_pct=98.673,involuntary_switches=11,sampled_node0=0,sampled_node1=62
+cpu=-1,completed=4416,busy_pct=98.581,involuntary_switches=21,sampled_node0=3,sampled_node1=63
+cpu=-1,completed=4800,busy_pct=98.189,involuntary_switches=5,sampled_node0=71,sampled_node1=0
+cpu=-1,completed=5136,busy_pct=98.797,involuntary_switches=8,sampled_node0=76,sampled_node1=0
+cpu=-1,completed=4496,busy_pct=98.189,involuntary_switches=24,sampled_node0=11,sampled_node1=56
+cpu=-1,completed=4336,busy_pct=98.508,involuntary_switches=19,sampled_node0=0,sampled_node1=64
+cpu=-1,completed=5184,busy_pct=98.496,involuntary_switches=9,sampled_node0=77,sampled_node1=0
+post_view_pages=412224,0
+[ perf record: Woken up 4 times to write data ]
+[ perf record: Captured and wrote 0.857 MB /tmp/hnsw-pebs-7byd62gm/perf.data (13116 samples) ]

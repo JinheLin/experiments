@@ -1,0 +1,26 @@
+rows=524288,maps=1,slots_per_index=18,mapped_pages_n0=412224,mapped_pages_n1=0,query_count=1000,query_copies=1,kernel=skylake
+seconds=5.009943,completed=119568,errors=0,short=0,qps=23866.142,cpu_cores=17.8684,host_idle_pct=72.507,cpu_us_per_query=748.6941,p50_us=747.664,p95_us=1009.818,p99_us=1189.818,samples=1789,minor_faults=4,major_faults=0,involuntary_switches=103,voluntary_switches=2630,latency_stride=67,host_busy_n0=18.855,host_busy_n1=0.948,host_busy_query_cpus=17.988,disk_read_bytes=0
+Events disabled
+Events enabled
+Events disabled
+cpu=0,completed=6672,busy_pct=99.203,involuntary_switches=44,sampled_node0=100,sampled_node1=0
+cpu=1,completed=6704,busy_pct=99.310,involuntary_switches=6,sampled_node0=101,sampled_node1=0
+cpu=2,completed=6656,busy_pct=99.364,involuntary_switches=7,sampled_node0=100,sampled_node1=0
+cpu=3,completed=6672,busy_pct=99.257,involuntary_switches=3,sampled_node0=100,sampled_node1=0
+cpu=4,completed=6704,busy_pct=99.297,involuntary_switches=3,sampled_node0=100,sampled_node1=0
+cpu=5,completed=6656,busy_pct=99.378,involuntary_switches=3,sampled_node0=100,sampled_node1=0
+cpu=6,completed=6704,busy_pct=99.184,involuntary_switches=3,sampled_node0=100,sampled_node1=0
+cpu=7,completed=6704,busy_pct=99.306,involuntary_switches=3,sampled_node0=100,sampled_node1=0
+cpu=8,completed=6544,busy_pct=99.346,involuntary_switches=3,sampled_node0=98,sampled_node1=0
+cpu=9,completed=6704,busy_pct=99.135,involuntary_switches=3,sampled_node0=100,sampled_node1=0
+cpu=10,completed=6576,busy_pct=99.326,involuntary_switches=3,sampled_node0=98,sampled_node1=0
+cpu=11,completed=6560,busy_pct=99.235,involuntary_switches=3,sampled_node0=98,sampled_node1=0
+cpu=12,completed=6704,busy_pct=99.149,involuntary_switches=4,sampled_node0=100,sampled_node1=0
+cpu=13,completed=6592,busy_pct=99.299,involuntary_switches=3,sampled_node0=99,sampled_node1=0
+cpu=14,completed=6560,busy_pct=99.263,involuntary_switches=3,sampled_node0=98,sampled_node1=0
+cpu=15,completed=6704,busy_pct=99.186,involuntary_switches=3,sampled_node0=100,sampled_node1=0
+cpu=16,completed=6592,busy_pct=99.322,involuntary_switches=3,sampled_node0=99,sampled_node1=0
+cpu=17,completed=6560,busy_pct=99.286,involuntary_switches=3,sampled_node0=98,sampled_node1=0
+post_view_pages=412224,0
+[ perf record: Woken up 17 times to write data ]
+[ perf record: Captured and wrote 0.518 MB /tmp/hnsw-pebs-3bfce5tb/perf.data (7912 samples) ]

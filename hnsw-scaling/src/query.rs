@@ -50,6 +50,19 @@ fn pin(cpu: usize) -> std::io::Result<()> {
     Ok(())
 }
 
+fn allowed_cpus() -> std::io::Result<Vec<usize>> {
+    // SAFETY: sched_getaffinity writes into the initialized CPU set.
+    unsafe {
+        let mut set: libc::cpu_set_t = std::mem::zeroed();
+        if libc::sched_getaffinity(0, size_of::<libc::cpu_set_t>(), &mut set) != 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+        Ok((0..libc::CPU_SETSIZE as usize)
+            .filter(|&cpu| libc::CPU_ISSET(cpu, &set))
+            .collect())
+    }
+}
+
 fn usage() -> libc::rusage {
     // SAFETY: getrusage writes into valid storage and uses the calling thread.
     unsafe {
@@ -186,6 +199,7 @@ struct Worker {
     involuntary: i64,
     voluntary: i64,
     latency_ns: Vec<u64>,
+    sampled_nodes: [u64; 2],
     #[cfg(feature = "slot-timing")]
     slot_wait: Vec<(u64, u64, u64)>,
 }
@@ -242,6 +256,13 @@ fn host_ticks(cpu_groups: &[usize; CPU_GROUPS], cpus: &[usize]) -> Result<[(u64,
     Ok(groups)
 }
 
+fn disk_read_bytes() -> Result<u64> {
+    let io = fs::read_to_string("/proc/self/io")?;
+    let value = io.lines().find_map(|line| line.strip_prefix("read_bytes:"))
+        .ok_or("missing process read_bytes counter")?;
+    Ok(value.trim().parse()?)
+}
+
 fn measure(
     cpus: &[usize],
     indexes: &[Index],
@@ -249,6 +270,7 @@ fn measure(
     duration: Duration,
     warmup: Duration,
     _mode: &str,
+    pin_workers: bool,
 ) -> Result<()> {
     let count = query_sets[0].len() / DIM;
     let stride = std::env::var("HNSW_LATENCY_STRIDE")
@@ -285,19 +307,22 @@ fn measure(
     let gate = Barrier::new(cpus.len() + 1);
     let start = OnceLock::new();
     let cpu_groups = cpu_groups()?;
+    let monitored_cpus = if pin_workers { cpus.to_vec() } else { allowed_cpus()? };
     let mut perf = Perf::open()?;
-    let (workers, elapsed, host) = thread::scope(|scope| -> Result<_> {
+    let (workers, elapsed, host, disk_read_bytes) = thread::scope(|scope| -> Result<_> {
         let threads: Vec<_> = cpus
             .iter()
             .enumerate()
             .map(|(id, &cpu)| {
                 let index = &indexes[id % indexes.len()];
                 let queries = &query_sets[id % query_sets.len()];
-                let (ready, gate, start, order) = (&ready, &gate, &start, &order);
+                let (ready, gate, start, order, cpu_groups) = (&ready, &gate, &start, &order, &cpu_groups);
                 scope.spawn(move || {
-                    if let Err(err) = pin(cpu) {
-                        eprintln!("cannot pin worker {id} to CPU {cpu}: {err}");
-                        std::process::abort();
+                    if pin_workers {
+                        if let Err(err) = pin(cpu) {
+                            eprintln!("cannot pin worker {id} to CPU {cpu}: {err}");
+                            std::process::abort();
+                        }
                     }
                     let initial = id * 331 % count;
                     let mut pos = initial / block * block * passes + initial % block;
@@ -357,6 +382,11 @@ fn measure(
                                     row.good += 1;
                                     if let Some(sampled) = sampled {
                                         row.latency_ns.push(sampled.elapsed().as_nanos() as u64);
+                                        // SAFETY: sched_getcpu takes no pointers and reports the current CPU.
+                                        let current = unsafe { libc::sched_getcpu() };
+                                        if let Some(&node) = cpu_groups.get(current as usize).filter(|&&node| node > 0) {
+                                            row.sampled_nodes[node - 1] += 1;
+                                        }
                                     }
                                 }
                                 Ok(_) => row.short += 1,
@@ -380,7 +410,8 @@ fn measure(
             })
             .collect();
         ready.wait();
-        let host_before = host_ticks(&cpu_groups, cpus);
+        let read_before = disk_read_bytes()?;
+        let host_before = host_ticks(&cpu_groups, &monitored_cpus);
         let enabled = perf.iter_mut().try_for_each(|p| p.command("enable"));
         let begin = Instant::now();
         start.set(begin).unwrap();
@@ -394,7 +425,7 @@ fn measure(
         enabled?;
         disabled?;
         let before = host_before?;
-        let after = host_ticks(&cpu_groups, cpus)?;
+        let after = host_ticks(&cpu_groups, &monitored_cpus)?;
         let idle_fraction = |group: usize| {
             (after[group].1 - before[group].1) as f64 / (after[group].0 - before[group].0) as f64
         };
@@ -408,6 +439,7 @@ fn measure(
             rows,
             elapsed,
             [100.0 * idle_fraction(0), busy_cores(1), busy_cores(2), busy_cores(3)],
+            disk_read_bytes()? - read_before,
         ))
     })?;
     let [host_idle_pct, host_busy_n0, host_busy_n1, host_busy_query_cpus] = host;
@@ -430,15 +462,16 @@ fn measure(
     if latency.is_empty() {
         return Err("no latency samples".into());
     }
-    println!("seconds={seconds:.6},completed={good},errors={failed},short={short},qps={:.3},cpu_cores={:.4},host_idle_pct={host_idle_pct:.3},cpu_us_per_query={:.4},p50_us={:.3},p95_us={:.3},p99_us={:.3},samples={},minor_faults={minor},major_faults={major},involuntary_switches={involuntary},voluntary_switches={voluntary},latency_stride={stride},host_busy_n0={host_busy_n0:.3},host_busy_n1={host_busy_n1:.3},host_busy_query_cpus={host_busy_query_cpus:.3}",
+    println!("seconds={seconds:.6},completed={good},errors={failed},short={short},qps={:.3},cpu_cores={:.4},host_idle_pct={host_idle_pct:.3},cpu_us_per_query={:.4},p50_us={:.3},p95_us={:.3},p99_us={:.3},samples={},minor_faults={minor},major_faults={major},involuntary_switches={involuntary},voluntary_switches={voluntary},latency_stride={stride},host_busy_n0={host_busy_n0:.3},host_busy_n1={host_busy_n1:.3},host_busy_query_cpus={host_busy_query_cpus:.3},disk_read_bytes={disk_read_bytes}",
         good as f64 / seconds, cpu / seconds, 1e6 * cpu / good as f64,
         percentile(50), percentile(95), percentile(99), latency.len());
     for (&cpu_id, worker) in cpus.iter().zip(&workers) {
+        let cpu_id = if pin_workers { cpu_id as isize } else { -1 };
         eprintln!(
-            "cpu={cpu_id},completed={},busy_pct={:.3},involuntary_switches={}",
+            "cpu={cpu_id},completed={},busy_pct={:.3},involuntary_switches={},sampled_node0={},sampled_node1={}",
             worker.good,
             100.0 * worker.cpu / seconds,
-            worker.involuntary
+            worker.involuntary, worker.sampled_nodes[0], worker.sampled_nodes[1]
         );
     }
     #[cfg(feature = "slot-timing")]
@@ -468,8 +501,23 @@ pub fn run(args: &[String]) -> Result<()> {
             let query_path = Path::new(&args[3]);
             let query_count = query_count(query_path)?;
             let mut query_sets = vec![vectors(query_path, query_count)?];
-            let cpus = args[6].split(',').map(str::parse::<usize>)
-                .collect::<std::result::Result<Vec<_>, _>>()?;
+            let pin_workers = !args[6].starts_with("unbound:");
+            let cpus = if let Some(threads) = args[6].strip_prefix("unbound:") {
+                let threads = threads.parse::<usize>()?;
+                if threads == 0 || threads > libc::CPU_SETSIZE as usize {
+                    return Err("unbound worker count is out of range".into());
+                }
+                if allowed_cpus()?.len() < 72 {
+                    return Err("unbound experiment requires access to all 72 host CPUs".into());
+                }
+                (0..threads).collect::<Vec<_>>()
+            } else {
+                args[6].split(',').map(str::parse::<usize>)
+                    .collect::<std::result::Result<Vec<_>, _>>()?
+            };
+            if !pin_workers && args[4] != "shared" {
+                return Err("unbound workers require shared mode".into());
+            }
             assert!(cpus.iter().all(|&cpu| cpu < libc::CPU_SETSIZE as usize));
             let ef = args[5].parse()?;
             let (indexes, slots, (pages0, pages1)) = if args[4] == "pair" {
@@ -520,7 +568,7 @@ pub fn run(args: &[String]) -> Result<()> {
             println!("rows={},maps={},slots_per_index={slots},mapped_pages_n0={pages0},mapped_pages_n1={pages1},query_count={query_count},query_copies={},kernel={}",
                 indexes[0].size(), indexes.len(), query_sets.len(), indexes[0].hardware_acceleration());
             measure(&cpus, &indexes, &query_sets, Duration::from_secs_f64(args[7].parse()?),
-                Duration::from_secs_f64(args[8].parse()?), &args[4])?;
+                Duration::from_secs_f64(args[8].parse()?), &args[4], pin_workers)?;
             if args[4] == "pair" {
                 let second = Path::new(&args[9]).canonicalize()?;
                 let mut a = mapped_pages(&path)?;
