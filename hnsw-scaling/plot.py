@@ -206,16 +206,54 @@ def numa_pairs(path, out):
     plt.close(fig)
 
 
+def query_reuse(path, out):
+    with path.open() as file:
+        rows = list(csv.DictReader(file))
+    variants = (
+        ("prefix-1k", "Prefix\n1K"),
+        ("random-1k-31", "Random\n1K #1"),
+        ("random-1k-47", "Random\n1K #2"),
+        ("random-1k-73", "Random\n1K #3"),
+        ("full-16k", "16K\nfull pass"),
+        ("blocked-16k", "16K\nblocks"),
+    )
+    x = list(range(len(variants)))
+    fig, axes = plt.subplots(1, 2, figsize=(10, 3.4), layout="constrained")
+    for ax, metric, title, unit in zip(axes, ("qps", "p99_us"), ("Throughput", "Tail latency"), ("kQPS", "P99 (ms)")):
+        for threads, color, shift in ((54, BLUE, -0.09), (72, ORANGE, 0.09)):
+            data = [series(rows, experiment="query", variant=key, threads=threads)[0] for key, _ in variants]
+            center = values(data, metric, 1000)
+            low = values(data, f"{metric}_min", 1000)
+            high = values(data, f"{metric}_max", 1000)
+            ax.errorbar([pos + shift for pos in x], center, yerr=[
+                [mid - lo for mid, lo in zip(center, low)],
+                [hi - mid for mid, hi in zip(center, high)],
+            ], marker="o", linestyle="none", capsize=3, color=color, label=f"{threads} workers")
+        axis(ax, title, unit, x)
+        ax.set(xlabel="", xticklabels=[label for _, label in variants])
+        ax.axvspan(3.5, 5.45, color="#c8d1d9", alpha=0.25)
+    axes[0].legend(frameon=False, fontsize=8)
+    budget = axes[1].axhline(2, color=GRAY, linestyle="--", linewidth=1, label="Example 2 ms budget")
+    axes[1].legend(handles=[budget], frameon=False, fontsize=8)
+    fig.savefig(out / "query-reuse.svg")
+    plt.close(fig)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("summary", type=Path)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--numa-pairs", type=Path, help="render only the longer paired NUMA comparison")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--numa-pairs", type=Path, help="render only the longer paired NUMA comparison")
+    mode.add_argument("--query-reuse", type=Path, help="render only the query-bank and order controls")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     plt.rcParams.update({"svg.fonttype": "none", "font.size": 9, "axes.titleweight": "bold"})
     if args.numa_pairs:
         numa_pairs(args.numa_pairs, args.output)
+        return
+    if args.query_reuse:
+        query_reuse(args.query_reuse, args.output)
         return
     with args.summary.open() as file:
         rows = list(csv.DictReader(file))

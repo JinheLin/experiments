@@ -155,6 +155,8 @@ def review_metrics(record):
     seconds = float(record["seconds"])
     row["involuntary_per_second"] = int(record["involuntary_switches"]) / seconds
     row["voluntary_per_second"] = int(record["voluntary_switches"]) / seconds
+    if "host_busy_query_cpus" in record:
+        row["non_worker_cores_on_query_cpus"] = float(record["host_busy_query_cpus"]) - row["cpu_cores"]
     for node in range(2):
         workers = sum(
             float(worker["busy_pct"]) / 100 for worker in record["workers"]
@@ -170,8 +172,8 @@ def review_metrics(record):
     return row
 
 
-def review(results):
-    directory = results / "review"
+def review(results, folder="review", variant_key="pressure"):
+    directory = results / folder
     rows = []
     pairs = defaultdict(dict)
     for path in sorted(directory.glob("*.jsonl")):
@@ -180,7 +182,7 @@ def review(results):
             record = json.loads(line)
             cell = tuple(record[key] for key in KEYS)
             rows_data = review_metrics(record)
-            cells[cell + (record.get("pressure", ""), int(record["query_count"]))].append((rows_data, record))
+            cells[cell + (record.get(variant_key, ""), int(record["query_count"]))].append((rows_data, record))
             if path.stem == "numa-long":
                 pairs[record["rep"]][record["placement"]] = rows_data
         for cell, repeats in sorted(cells.items()):
@@ -188,7 +190,7 @@ def review(results):
             qps = [row["qps"] for row in metrics]
             p99 = [row["p99_us"] for row in metrics]
             row = {
-                "experiment": path.stem, **dict(zip((*KEYS, "pressure", "query_count"), cell)),
+                "experiment": path.stem, **dict(zip((*KEYS, variant_key, "query_count"), cell)),
                 "reps": len(repeats), **{key: median(metric[key] for metric in metrics) for key in metrics[0]},
                 "qps_min": min(qps), "qps_max": max(qps), "p99_us_min": min(p99), "p99_us_max": max(p99),
             }
@@ -223,15 +225,21 @@ def review(results):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("results", type=Path)
-    parser.add_argument("--review-only", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--review-only", action="store_true")
+    mode.add_argument("--followup-only", action="store_true")
     args = parser.parse_args()
     if args.review_only:
         review(args.results)
+        return
+    if args.followup_only:
+        review(args.results, "followup", "variant")
         return
     benchmark(args.results)
     bandwidth(args.results)
     latency(args.results)
     review(args.results)
+    review(args.results, "followup", "variant")
 
 
 if __name__ == "__main__":

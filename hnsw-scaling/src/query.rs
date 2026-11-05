@@ -72,6 +72,15 @@ fn open_view(path: &str, ef: usize, slots: usize) -> Result<Index> {
     Ok(index)
 }
 
+fn query_count(path: &Path) -> Result<usize> {
+    let bytes_per_query = (DIM * size_of::<f32>()) as u64;
+    let bytes = path.metadata()?.len();
+    if bytes == 0 || bytes % bytes_per_query != 0 {
+        return Err("query file must contain one or more complete float32 vectors".into());
+    }
+    Ok(usize::try_from(bytes / bytes_per_query)?)
+}
+
 fn prefault(path: &Path, expected_maps: usize) -> Result<(u64, u64)> {
     let name = path.to_str().ok_or("invalid index path")?;
     let mut maps = 0;
@@ -204,27 +213,31 @@ fn cpu_groups() -> Result<[usize; CPU_GROUPS]> {
     Ok(groups)
 }
 
-fn host_ticks(cpu_groups: &[usize; CPU_GROUPS]) -> Result<[(u64, u64); 3]> {
+fn host_ticks(cpu_groups: &[usize; CPU_GROUPS], cpus: &[usize]) -> Result<[(u64, u64); 4]> {
     let stat = fs::read_to_string("/proc/stat")?;
-    let mut groups = [(0, 0); 3];
+    let mut groups = [(0, 0); 4];
     for line in stat.lines().take_while(|line| line.starts_with("cpu")) {
         let mut fields = line.split_whitespace();
         let id = fields.next().unwrap().strip_prefix("cpu").unwrap();
-        let group = if id.is_empty() {
-            0
-        } else {
-            let cpu = id.parse::<usize>()?;
-            match cpu_groups.get(cpu) {
-                Some(&group) if group != 0 => group,
-                _ => continue,
-            }
-        };
         let ticks = fields
             .take(8)
             .map(str::parse::<u64>)
             .collect::<std::result::Result<Vec<_>, _>>()?;
-        groups[group].0 += ticks.iter().sum::<u64>();
-        groups[group].1 += ticks[3] + ticks[4];
+        let total = ticks.iter().sum::<u64>();
+        let idle = ticks[3] + ticks[4];
+        if id.is_empty() {
+            groups[0] = (total, idle);
+            continue;
+        }
+        let cpu = id.parse::<usize>()?;
+        if let Some(&group) = cpu_groups.get(cpu).filter(|&&group| group != 0) {
+            groups[group].0 += total;
+            groups[group].1 += idle;
+        }
+        if cpus.contains(&cpu) {
+            groups[3].0 += total;
+            groups[3].1 += idle;
+        }
     }
     Ok(groups)
 }
@@ -252,6 +265,21 @@ fn measure(
         random ^= random << 17;
         order.swap(end, random as usize % (end + 1));
     }
+    let (block, passes) = if let Ok(block) = std::env::var("HNSW_QUERY_BLOCK") {
+        let block = block.parse::<usize>()?;
+        if block == 0 || count % block != 0 {
+            return Err("query block size must divide the number of queries".into());
+        }
+        (block, 4)
+    } else {
+        (count, 1)
+    };
+    if passes > 1 {
+        order = order
+            .chunks(block)
+            .flat_map(|chunk| (0..passes).flat_map(move |_| chunk.iter().copied()))
+            .collect();
+    }
 
     let ready = Barrier::new(cpus.len() + 1);
     let gate = Barrier::new(cpus.len() + 1);
@@ -271,11 +299,12 @@ fn measure(
                         eprintln!("cannot pin worker {id} to CPU {cpu}: {err}");
                         std::process::abort();
                     }
-                    let mut pos = (id * 331) % count;
+                    let initial = id * 331 % count;
+                    let mut pos = initial / block * block * passes + initial % block;
                     let mut search = || {
                         let offset = order[pos] * DIM;
                         pos += 1;
-                        if pos == count {
+                        if pos == order.len() {
                             pos = 0;
                         }
                         let query = &queries[offset..offset + DIM];
@@ -351,7 +380,7 @@ fn measure(
             })
             .collect();
         ready.wait();
-        let host_before = host_ticks(&cpu_groups);
+        let host_before = host_ticks(&cpu_groups, cpus);
         let enabled = perf.iter_mut().try_for_each(|p| p.command("enable"));
         let begin = Instant::now();
         start.set(begin).unwrap();
@@ -365,7 +394,7 @@ fn measure(
         enabled?;
         disabled?;
         let before = host_before?;
-        let after = host_ticks(&cpu_groups)?;
+        let after = host_ticks(&cpu_groups, cpus)?;
         let idle_fraction = |group: usize| {
             (after[group].1 - before[group].1) as f64 / (after[group].0 - before[group].0) as f64
         };
@@ -378,10 +407,10 @@ fn measure(
         Ok((
             rows,
             elapsed,
-            [100.0 * idle_fraction(0), busy_cores(1), busy_cores(2)],
+            [100.0 * idle_fraction(0), busy_cores(1), busy_cores(2), busy_cores(3)],
         ))
     })?;
-    let [host_idle_pct, host_busy_n0, host_busy_n1] = host;
+    let [host_idle_pct, host_busy_n0, host_busy_n1, host_busy_query_cpus] = host;
 
     let mut latency: Vec<_> = workers
         .iter()
@@ -401,7 +430,7 @@ fn measure(
     if latency.is_empty() {
         return Err("no latency samples".into());
     }
-    println!("seconds={seconds:.6},completed={good},errors={failed},short={short},qps={:.3},cpu_cores={:.4},host_idle_pct={host_idle_pct:.3},cpu_us_per_query={:.4},p50_us={:.3},p95_us={:.3},p99_us={:.3},samples={},minor_faults={minor},major_faults={major},involuntary_switches={involuntary},voluntary_switches={voluntary},latency_stride={stride},host_busy_n0={host_busy_n0:.3},host_busy_n1={host_busy_n1:.3}",
+    println!("seconds={seconds:.6},completed={good},errors={failed},short={short},qps={:.3},cpu_cores={:.4},host_idle_pct={host_idle_pct:.3},cpu_us_per_query={:.4},p50_us={:.3},p95_us={:.3},p99_us={:.3},samples={},minor_faults={minor},major_faults={major},involuntary_switches={involuntary},voluntary_switches={voluntary},latency_stride={stride},host_busy_n0={host_busy_n0:.3},host_busy_n1={host_busy_n1:.3},host_busy_query_cpus={host_busy_query_cpus:.3}",
         good as f64 / seconds, cpu / seconds, 1e6 * cpu / good as f64,
         percentile(50), percentile(95), percentile(99), latency.len());
     for (&cpu_id, worker) in cpus.iter().zip(&workers) {
@@ -425,7 +454,8 @@ pub fn run(args: &[String]) -> Result<()> {
         #[cfg(feature = "diagnostic")]
         Some("work") if args.len() == 5 => {
             let index = open_view(&args[2], args[4].parse()?, 1)?;
-            let queries = vectors(Path::new(&args[3]), 1000)?;
+            let path = Path::new(&args[3]);
+            let queries = vectors(path, query_count(path)?)?;
             graph_work(&index, &queries)
         }
         Some("recall") if args.len() == 6 => {
@@ -436,12 +466,7 @@ pub fn run(args: &[String]) -> Result<()> {
         Some("bench") if matches!(args.len(), 9 | 10) => {
             let path = Path::new(&args[2]).canonicalize()?;
             let query_path = Path::new(&args[3]);
-            let bytes_per_query = (DIM * size_of::<f32>()) as u64;
-            let query_bytes = query_path.metadata()?.len();
-            if query_bytes == 0 || query_bytes % bytes_per_query != 0 {
-                return Err("query file must contain one or more complete float32 vectors".into());
-            }
-            let query_count = usize::try_from(query_bytes / bytes_per_query)?;
+            let query_count = query_count(query_path)?;
             let mut query_sets = vec![vectors(query_path, query_count)?];
             let cpus = args[6].split(',').map(str::parse::<usize>)
                 .collect::<std::result::Result<Vec<_>, _>>()?;

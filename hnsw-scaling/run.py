@@ -83,9 +83,11 @@ def fields(line):
     return dict(item.split("=", 1) for item in line.strip().split(","))
 
 
-def run_cell(case, rep, args):
+def run_cell(case, rep, args, *, cpus=None, query_block=None):
     rows, mode, ef, placement, pages, threads = case
-    cpus = {"local": LOCAL, "local-smt": LOCAL_SMT, "remote": REMOTE, "spread": SPREAD}[placement][:threads]
+    if cpus is None:
+        cpus = {"local": LOCAL, "local-smt": LOCAL_SMT, "remote": REMOTE, "spread": SPREAD}[placement][:threads]
+    assert len(cpus) == len(set(cpus)) == threads
     index = args.data / f"laion-{rows}{'-interleave' if pages == 'interleave' else ''}.usearch"
     policy = {
         "local": "--membind=0", "local-smt": "--membind=0",
@@ -111,6 +113,8 @@ def run_cell(case, rep, args):
             "env", f"HNSW_PERF_FIFOS={ctl}", f"HNSW_LATENCY_STRIDE={args.latency_stride}", "perf", "stat", "-x,", "--delay=-1",
             f"--control=fifo:{ctl}", "-o", str(core_stat), "-e", events, "--", *cmd,
         ]
+        if query_block is not None:
+            cmd.insert(2, f"HNSW_QUERY_BLOCK={query_block}")
         if args.imc:
             imc_ctl, imc_ack = directory / "imc-ctl", directory / "imc-ack"
             os.mkfifo(imc_ctl)

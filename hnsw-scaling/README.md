@@ -142,3 +142,53 @@ python3 summarize.py results --review-only
 uv run --no-project --with matplotlib==3.11.2 python plot.py \
   results/summary.csv figures --numa-pairs results/review/numa-pairs.csv
 ```
+
+## Check CPU headroom and query reuse
+
+Reuse the local index replicas and held-out banks prepared above. Build the stock
+binary and refresh the generated diagnostic build after updating the Rust sources.
+The diagnostic work probe runs each vector through the pooled and explicit-slot
+paths and checks agreement before reporting mean graph visits and distance
+evaluations. It runs separately from the timed searches.
+
+```bash
+mkdir -p results/followup
+bash build.sh --offline
+base="$PWD"
+(
+  cd diagnostic-slot
+  cp "$base/src/query.rs" src/query.rs
+  CARGO_TARGET_DIR="$base/target" bash "$base/build.sh" --offline --features slot-timing
+)
+python3 followup.py cpu results/followup/cpu.jsonl
+python3 followup.py query results/followup/query.jsonl
+python3 followup.py adjacent results/followup/adjacent.jsonl
+python3 summarize.py results --followup-only
+uv run --no-project --with matplotlib==3.11.2 python plot.py \
+  results/summary.csv figures --query-reuse results/followup/summary.csv
+```
+
+The CPU sweep excludes three whole cores per socket from the search affinity at
+36, 48, 54 and 60 workers. Those four configurations use the same 30 physical
+cores and progressively add SMT siblings. The 72-worker comparison covers the
+whole machine. The separate interference test keeps the 54-worker affinity
+fixed and pins four CPU-bound processes either to reserved physical cores or to
+four occupied logical CPUs with unused SMT siblings. Affinity applies to the
+test processes. Host services continue using their normal CPU masks. The
+benchmark and synthetic competitors inherited nice +5 on this machine. The
+summary estimates non-query busy time on the exact worker CPUs from
+`/proc/stat` minus summed worker runtime, including CPU time spent in other
+tasks or kernel work.
+
+The query comparison uses the original held-out prefix, three reproducible
+1,000-vector draws from the same held-out bank, and two orders of all 16,384
+vectors. The full pass cycles through the entire shuffled bank. The blocked
+order repeats each consecutive 256-query block four times before advancing.
+Both 16K orders use the same vectors and the same query frequencies across a
+complete schedule. Each worker starts warmup at the same vector in both 16K
+orders, with staggered offsets across workers. The adjacent-reuse control
+pairs a full pass with four consecutive copies of each individual query at
+54 workers. The graph-work CSV records the bank checksums and the mean work
+for a complete pass. Timed runs use three 8-second windows per cell, sample one
+call in four, and retain the observed minimum and maximum in the summary.
+The plotted 2 ms line is an example budget for the closed-loop P99.
